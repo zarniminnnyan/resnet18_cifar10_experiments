@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual environments
+.env
+.venv/
+env/
+venv/
+*.env
+
+# Jupyter/Colab
+.ipynb_checkpoints/
+*.ipynb
+
+# Logs and outputs
+*.log
+logs/
+lightning_logs/
+*.ckpt
+checkpoints/
+runs/
+
+# Data
+data/
+*.zip
+*.tar
+*.gz
+
+# Model artifacts
+*.pth
+*.pt
+*.onnx
+
+# IDE/editor files
+.vscode/
+.idea/
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build
+build/
+dist/
+*.egg-info/
