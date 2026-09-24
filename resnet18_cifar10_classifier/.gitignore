@@ -12,7 +12,7 @@ env/
 venv/
 *.env
 
-# Jupyter/Colab
+# Jupyter / Colab
 .ipynb_checkpoints/
 *.ipynb
 
@@ -35,7 +35,7 @@ data/
 *.pt
 *.onnx
 
-# IDE/editor files
+# IDE / Editor files
 .vscode/
 .idea/
 *.swp
@@ -48,3 +48,11 @@ Thumbs.db
 build/
 dist/
 *.egg-info/
+
+# Lightning AI Studio / Remote servers
+.idea/
+.vscode/
+.lightning_studio/
+.vscode-server/
+.cursor-server/
+.windsurf-server/
