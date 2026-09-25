@@ -39,7 +39,7 @@ def evaluate_baseline_resnet18(
   total_loss=0.0
 
   #pass dataloader into tqdm
-  validataion_dataloader=tqdm(val_dataloader,desc="Validation baseline is in progress")
+  validation_dataloader=tqdm(val_dataloader,desc="Validation baseline is in progress")
 
  #send model to the device and set the eval mode
   baseline_model.to(device)
@@ -48,7 +48,7 @@ def evaluate_baseline_resnet18(
   #turn off the updating gradients
   with torch.no_grad():
 
-    for images,labels in validataion_dataloader:
+    for images,labels in validation_dataloader:
       img,label=images.to(device),labels.to(device)
       #predict
       outputs=baseline_model(img)
