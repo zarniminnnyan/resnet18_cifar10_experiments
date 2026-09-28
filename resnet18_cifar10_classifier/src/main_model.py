@@ -150,8 +150,8 @@ def lightning_callbacks(model_checkpoint_path:str):
             monitor="val_acc",
             dirpath=model_checkpoint_path,
             mode="max",
-            save_top_k=1,
-            save_last=True
+            save_top_k=1, #the best val acc will be stored by random name of Lightning
+            save_last=True #it will be saved as last.ckpt by default file name
         )
     ]
     return callbacks

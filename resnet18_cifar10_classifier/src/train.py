@@ -163,7 +163,7 @@ def main():
             save_model_path=main_model_dir,
             resume=args.resume,
             logger_filename=f"main_model_{args.experiments}_metrics",
-            last_ckpt_file=f"{args.experiments}_last_saved.ckpt"
+            last_ckpt_file="last.ckpt"
         )
 
 if __name__=="__main__":
