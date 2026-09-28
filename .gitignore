@@ -14,7 +14,6 @@ venv/
 
 # Jupyter / Colab
 .ipynb_checkpoints/
-*.ipynb
 
 # Logs and outputs
 *.log
