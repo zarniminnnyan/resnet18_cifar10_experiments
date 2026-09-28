@@ -45,6 +45,7 @@ def configurable_arguments():
     parser.add_argument("--batch_size",type=int,default=128,help=" batch size for model experiment")
     parser.add_argument("--main_model_lr",type=float,nargs="+",default=[1e-4,1e-3], help="list of learning rates for main model")
     parser.add_argument("--main_model_layers",type=str,nargs="+",default=["layer4","fc"], help="list of layers to unfreeze for main model")
+    parser.add_argument("--resume", action="store_true", help="Resume the experiment")
 
 
     args=parser.parse_args()
@@ -55,7 +56,8 @@ def configurable_arguments():
           f"main model lr: {args.main_model_lr}\n Image Input size: {args.image_size}\n"
           f"num worker: {args.num_worker}\n"
           f"main model unfreezed layers: {args.main_model_layers}\n"
-          f"ML experiments number : {args.experiments}\n\n"
+          f"ML experiments number : {args.experiments}\n"
+          f"resume the experiment : {args.resume}\nn"
           )
 
     return args  
@@ -107,9 +109,14 @@ def main():
         test_dataset=test_dataset
     )   
 
+    print("\n\n")
+
     print(f"length of train dataset after splitting {len(train_dataset)}")
     print(f"length of val dataset after splitting {len(val_dataset)}")
     print(f"length of test dataset  {len(test_dataset)}")
+    print(f"Applied standard augmentation: {standard_aug_flag}")
+    print(f"Applied Lr scheduler: {add_lr_scheduler}")
+    print(f"Applied cutmix/mixup: {apply_cutmix_mixup}\n\n")
 
     if baseline:
         #train baseline model 
@@ -122,7 +129,7 @@ def main():
             num_epochs=args.epochs,
             learning_rate=args.baseline_lr,
             resume_dir=resume_dir,
-            resume=True,
+            resume=args.resume,
             device=device
             )
 
@@ -154,7 +161,7 @@ def main():
             val_dataloader=val_dataloader,
             resnet18_lightning=Lightning_class,num_epochs=args.epochs,
             save_model_path=main_model_dir,
-            resume=True,
+            resume=args.resume,
             logger_filename=f"main_model_{args.experiments}_metrics",
             last_ckpt_file=f"{args.experiments}_last_saved.ckpt"
         )
