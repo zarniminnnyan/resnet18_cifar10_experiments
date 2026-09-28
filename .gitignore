@@ -25,6 +25,7 @@ checkpoints/
 runs/
 
 # Data
+results/
 data/
 *.zip
 *.tar

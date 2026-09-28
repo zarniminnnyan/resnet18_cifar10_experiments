@@ -228,11 +228,12 @@ def train_baseline_classifier(
 
         #save training history 
         history = {
-            "train_accuracy": train_accuracy_collection,
+            "train_acc": train_accuracy_collection,
             "train_loss": train_loss_collection,
-            "val_accuracy": val_accuracy_collection,
+            "val_acc": val_accuracy_collection,
             "val_loss": val_loss_collection
              }
+             
         #saving the history with torch.save 
         torch.save(
             history,

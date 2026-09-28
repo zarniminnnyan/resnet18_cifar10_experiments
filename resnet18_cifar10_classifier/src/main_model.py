@@ -187,7 +187,7 @@ def lightning_trainer(
     # Apply trainer
     trainer = pl.Trainer(
         max_epochs=num_epochs,
-        accelerator="cpu",
+        accelerator="auto",
         devices=1,
         enable_progress_bar=True,
         precision="32-true",
