@@ -77,7 +77,8 @@ class Resnet18Lightning(pl.LightningModule):
          self, model: torch.nn.Module,
          T_max: int, num_classes: int,
          add_scheduler:bool, 
-         trainable_params_group:List[Dict]
+         trainable_params_group:List[Dict],
+         layers:list
          ):
 
         super().__init__()
@@ -92,7 +93,8 @@ class Resnet18Lightning(pl.LightningModule):
 
         # get the parameters if require_grad is True and set the lr for layer4 and fc specifically
         self.trainable_params_and_lr =trainable_params_group 
-
+      
+      
     def forward(self, x):
         """passing data through the model"""
         return self.model(x)
@@ -110,6 +112,14 @@ class Resnet18Lightning(pl.LightningModule):
 
         self.train_acc(outputs,targets)
 
+        if self.hparams.add_scheduler:
+
+            #log the learning rate to see the performance after using Cosine Annealing
+            for layer_name,param_group in zip(self.hparams.layers,self.optimizers().param_groups):
+                 #log learning rate changes based on epoch
+                 self.log(f"{layer_name}_lr",param_group["lr"],prog_bar=False,on_step=False,on_epoch=True)
+
+        #log the train_acc and train_loss 
         self.log("train_acc",self.train_acc, on_step=False,on_epoch=True,prog_bar=True)
         self.log("train_loss", loss, on_step=False, on_epoch=True, prog_bar=True)
 

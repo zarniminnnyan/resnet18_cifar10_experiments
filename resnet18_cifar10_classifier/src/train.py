@@ -152,7 +152,8 @@ def main():
             model=main_model,T_max=args.epochs,
             num_classes=cifar10_classes,
             add_scheduler=add_lr_scheduler,
-            trainable_params_group=optimizer_params
+            trainable_params_group=optimizer_params,
+            layers=args.main_model_layers
             )
 
         #train Lightning 
