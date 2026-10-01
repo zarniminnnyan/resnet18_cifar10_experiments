@@ -1,7 +1,7 @@
 from utils.helper_utils import load_resnet18
 from config.exp_config import logs_dir
 from typing import List,Dict
-from torch.optim.lr_scheduler import CosineAnnealingLR
+from torch.optim.lr_scheduler import CosineAnnealingLR,CosineAnnealingWarmRestarts
 import torch.nn.functional as F
 import pytorch_lightning as pl
 import torchmetrics.classification as metrics
@@ -76,7 +76,8 @@ class Resnet18Lightning(pl.LightningModule):
     def __init__(
          self, model: torch.nn.Module,
          T_max: int, num_classes: int,
-         add_scheduler:bool, 
+         add_scheduler:bool,
+         change_to_warmstart_scheduler:bool, 
          trainable_params_group:List[Dict],
          layers:list
          ):
@@ -141,10 +142,21 @@ class Resnet18Lightning(pl.LightningModule):
 
         #add scheduler if True
         if self.hparams.add_scheduler:
-            
-            scheduler = CosineAnnealingLR(optimizer, T_max=self.hparams.T_max)
-            return {"optimizer": optimizer, "lr_scheduler": {"scheduler": scheduler, "interval": "epoch"}}
 
+            if self.hparams.change_to_warmstart_scheduler:
+                scheduler =CosineAnnealingWarmRestarts(
+                    optimizer, 
+                    T_0=20,          # Number of epochs before the first restart
+                    T_mult=2,        # Factor to multiply the period after every restart (20, 40, 80...)
+                     eta_min=1e-6,    # Minimum learning rate at the bottom of the curve
+                     last_epoch=-1
+                     )
+
+            else:
+                scheduler = CosineAnnealingLR(optimizer, T_max=self.hparams.T_max)
+
+            return {"optimizer": optimizer, "lr_scheduler": {"scheduler": scheduler, "interval": "epoch"}}
+        #return when add scheduler is False
         return {"optimizer":optimizer}
 
 def lightning_callbacks(model_checkpoint_path:str):

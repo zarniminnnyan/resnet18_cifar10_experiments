@@ -46,19 +46,35 @@ def configurable_arguments():
     parser.add_argument("--main_model_lr",type=float,nargs="+",default=[1e-4,1e-3], help="list of learning rates for main model")
     parser.add_argument("--main_model_layers",type=str,nargs="+",default=["layer4","fc"], help="list of layers to unfreeze for main model")
     parser.add_argument("--resume", action="store_true", help="Resume the experiment")
+    parser.add_argument("--add_random_erasing", action="store_true", help="Add random erasing augmentation")
+    parser.add_argument("--add_warmstart_scheduler", action="store_true", help="Add consine Annealing Warmstart learning rate scheduler at the main model")
+
+
 
 
     args=parser.parse_args()
 
-    print(
-          f"The configured arguments are:\nepochs: {args.epochs}\n"
-          f"baseline lr: {args.baseline_lr}\nbatch size: {args.batch_size}\n"
-          f"main model lr: {args.main_model_lr}\n Image Input size: {args.image_size}\n"
-          f"num worker: {args.num_worker}\n"
-          f"main model unfreezed layers: {args.main_model_layers}\n"
-          f"ML experiments number : {args.experiments}\n"
-          f"resume the experiment : {args.resume}\nn"
-          )
+    if args.baseline: 
+        print(
+            f"The configured arguments are:\nepochs: {args.epochs}\n"
+            f"baseline lr: {args.baseline_lr}\nbatch size: {args.batch_size}\n"
+            f"Image Input size: {args.image_size}\n"
+            f"ML experiments number : {args.experiments}\n"
+            f"add random erasing: {args.add_random_erasing}\n\n"
+            f"resume the experiment : {args.resume}\n\n"
+        )
+
+    else:
+        print(
+            f"The configured arguments are:\nepochs: {args.epochs}\n"
+            f"main model lr: {args.main_model_lr}\nImage Input size: {args.image_size}\n"
+            f"num worker: {args.num_worker}\n"
+            f"main model unfreezed layers: {args.main_model_layers}\n"
+            f"ML experiments number : {args.experiments}\n"
+            f"resume the experiment : {args.resume}\n"
+            f"add random erasing: {args.add_random_erasing}\n"
+            f"add warm start: {args.add_warmstart_scheduler}\n\n"
+        )
 
     return args  
 
@@ -95,7 +111,8 @@ def main():
         dataset_path=dataset_dir,
         build_transforms=build_transforms,
         image_size=args.image_size,
-        standard_aug=standard_aug_flag #set False not to be applied standard augmentation or True
+        standard_aug=standard_aug_flag ,#set False not to be applied standard augmentation or True
+        add_random_erasing=args.add_random_erasing
         )
     
     #call dataloaders function
@@ -152,6 +169,7 @@ def main():
             model=main_model,T_max=args.epochs,
             num_classes=cifar10_classes,
             add_scheduler=add_lr_scheduler,
+            change_to_warmstart_scheduler=args.add_warmstart_scheduler,
             trainable_params_group=optimizer_params,
             layers=args.main_model_layers
             )

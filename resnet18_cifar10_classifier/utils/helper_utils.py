@@ -128,7 +128,7 @@ def split_dataset(raw_dataset,train_transform,val_transform):
 
 
 
-def load_prepare_cifar10(dataset_path:str,build_transforms:Callable,image_size:int,standard_aug:bool):
+def load_prepare_cifar10(dataset_path:str,build_transforms:Callable,image_size:int,standard_aug:bool,add_random_erasing:bool):
     """
     This function is for downloading the cifar10 dataset 
 
@@ -153,7 +153,11 @@ def load_prepare_cifar10(dataset_path:str,build_transforms:Callable,image_size:i
     #make the dataset path if no exist
     os.makedirs(dataset_path,exist_ok=True)
     #Load transform function
-    train_transform,val_transform=build_transforms(image_size=image_size,standardard_augmentation=standard_aug)
+    train_transform,val_transform=build_transforms(
+        image_size=image_size,
+        standardard_augmentation=standard_aug,
+        random_erasing=add_random_erasing
+        )
 
     try:
         #Download dataset if the data does not exist, is corrupted or is missing
@@ -190,7 +194,7 @@ def load_prepare_cifar10(dataset_path:str,build_transforms:Callable,image_size:i
     return train_dataset,val_dataset,test_dataset
 
 
-def build_transforms(image_size:int,standardard_augmentation:bool):
+def build_transforms(image_size:int,standardard_augmentation:bool,random_erasing:bool):
 
   """
   Apply augmentation to the train dataset
@@ -220,6 +224,13 @@ def build_transforms(image_size:int,standardard_augmentation:bool):
         )
     ]
 
+  add_random_erasing=[transform.RandomErasing(p=0.5, 
+  scale=(0.02, 0.33),
+  ratio=(0.3, 3.3),
+  value='random'
+  )
+]
+
   if standardard_augmentation:
 
     #apply standard augmenation 
@@ -228,6 +239,9 @@ def build_transforms(image_size:int,standardard_augmentation:bool):
         transform.RandomRotation(degrees=15),
         *train_pipeline
         ]
+
+  if random_erasing:
+        train_pipeline +=add_random_erasing
     
     
   train_transform=transform.Compose(train_pipeline)
