@@ -1,4 +1,4 @@
-from src.main_model import Resnet18Lightning
+from src.main_model import Resnet18Lightning,resnet18_main_model_setup
 from tqdm.auto import tqdm
 from torchvision.models import resnet18
 import torch.nn.functional as F
@@ -8,12 +8,74 @@ import torch
 import os
 
 
+def get_parameters_for_lightning_model_inference(
+    model_dir: str,
+    experiment_name: str,
+    device: torch.device
+):
+    """
+    Extracts training configurations and reconstructs parameters from a legacy checkpoint.
+
+    NOTE: This manual extraction function is explicitly required for previously trained 
+    legacy models because the original `__init__` constructor used `ignore=['model']` 
+    and added the change_to_warmstart_scheduler argument after training from exp1 to exp5,
+    this breaks lighning's original 
+    model loading style
+
+    RECOMMENDATION FOR FUTURE TRAINING RUNS:
+
+    To bypass this extraction function entirely in future experiments, avoid passing raw 
+    `nn.Module` objects or live parameter groups into `__init__`. Instead, pass primitive 
+    datatypes (e.g., `learning_rates: list`) and build the model architecture inside
+    the LightningModule constructor. Doing so will enable simple, one-line loading 
+    via `Resnet18Lightning.load_from_checkpoint("path.ckpt")`.
+
+    Args:
+        model_dir (str): Root directory where experiments are stored.
+        experiment_name (str): Specific experiment folder and weight name prefix.
+        device (torch.device): Compute device target (CPU or GPU).
+
+    Returns:
+        tuple: (base_model,change_to_warmstart_scheduler)
+    """
+    ckpt_path = os.path.join(f"{model_dir}/{experiment_name}", f"{experiment_name}_weight.ckpt")
+    
+    # Load raw checkpoint safely to device memory
+    checkpoint = torch.load(ckpt_path, map_location=device)
+    
+    # Extract successfully logged primitive configurations
+    saved_hparams = checkpoint.get("hyper_parameters", {})
+    print("--- Extracting Configurations ---")
+    
+    try:
+        layers = saved_hparams["layers"]
+       
+        change_to_warmstart_scheduler = saved_hparams.get("change_to_warmstart_scheduler", False)
+        
+        optimizer_states = checkpoint.get("optimizer_states", [])
+        if optimizer_states:
+            learning_rates = [group["lr"] for group in optimizer_states[0]["param_groups"]]
+        else:
+            raise KeyError("optimizer_states empty or missing in the checkpoint file.")
+
+        print(f"Extracted learning rates from training: {learning_rates}")
+        
+    except (KeyError, IndexError, TypeError) as e:
+        print(f"Extraction failed: Critical training parameters are missing from this checkpoint.")
+        raise e
+        
+    # Rebuild the missing underlying PyTorch architecture manually from extracted configs
+    base_model = resnet18_main_model_setup(device=device, trainable_layers_group=layers)
+
+    return base_model,change_to_warmstart_scheduler
+
 
 def load_model_for_test(
     is_baseline:bool,
     model_dir:str,
     experiment_name:str,
-    num_classes:int
+    num_classes:int,
+    device:torch.device
     ):
     
     """
@@ -39,15 +101,26 @@ def load_model_for_test(
     #load the existed model weights
     if is_baseline:
       #weight dir
-      baseline_weight_directory=os.path.join(model_dir,"best_baseline_eval_model.pth")
+      baseline_weight_directory=os.path.join(f"{model_dir}/baseline","best_baseline_eval_model.pth")
       #load model
-      state_dict=torch.load(baseline_weight_directory,map_location="cpu")
+      state_dict=torch.load(baseline_weight_directory,map_location=device)
       model.load_state_dict(state_dict)
       
     else:
-        model=Resnet18Lightning.load_from_checkpoint(os.path.join(model_dir,f"{experiment_name}_weight.ckpt"))
+        base_model,change_to_warmstart_scheduler=get_parameters_for_lightning_model_inference(
+            model_dir=model_dir,
+             experiment_name=experiment_name,
+             device=device
+             )     
+        
+        model=Resnet18Lightning.load_from_checkpoint(
+            checkpoint_path=os.path.join(f"{model_dir}/{experiment_name}",f"{experiment_name}_weight.ckpt"),
+            model=base_model,
+            change_to_warmstart_scheduler=change_to_warmstart_scheduler
+            )
         
     return model
+
 
 
 def test_model(
@@ -125,4 +198,3 @@ def test_model(
 
 
   return test_history
-

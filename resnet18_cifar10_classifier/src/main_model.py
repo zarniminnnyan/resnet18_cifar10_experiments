@@ -75,7 +75,8 @@ class Resnet18Lightning(pl.LightningModule):
 
     def __init__(
          self, model: torch.nn.Module,
-         T_max: int, num_classes: int,
+         T_max: int,
+          num_classes: int,
          add_scheduler:bool,
          change_to_warmstart_scheduler:bool, 
          trainable_params_group:List[Dict],

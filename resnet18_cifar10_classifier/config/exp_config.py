@@ -33,8 +33,8 @@ baseline_model_dir="/teamspace/studios/this_studio/resnet18_cifar10_classifier/r
 #main model directory 
 main_model_dir="./checkpoints/main_model_eval_weight"
 
-#csv file path- Note: if you have trained main model and saved the csv metrics in 'main_model_dir' via pytorch lightning ModelCheckpoints,
+#csv file path- (( Note: if you have trained main model and saved the csv metrics in 'main_model_dir' via pytorch lightning ModelCheckpoints,
 # you will need to download each manually and then add them in the 'csv file path' because when you resume training 
-# over and over, the metrics file is not stacked in one file. it is seperate file by file.
+# over and over, the metrics file is not stacked in one file. it is seperated file by file))
 
 csv_file_path="/teamspace/studios/this_studio/resnet18_cifar10_classifier/results"
