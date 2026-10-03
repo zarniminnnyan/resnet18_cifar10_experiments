@@ -48,7 +48,7 @@ def get_parameters_for_lightning_model_inference(
     print("--- Extracting Configurations ---")
     
     try:
-        layers = saved_hparams["layers"]
+        layers = saved_hparams.get("layers",["layer4","fc"])
        
         change_to_warmstart_scheduler = saved_hparams.get("change_to_warmstart_scheduler", False)
         
@@ -67,7 +67,7 @@ def get_parameters_for_lightning_model_inference(
     # Rebuild the missing underlying PyTorch architecture manually from extracted configs
     base_model = resnet18_main_model_setup(device=device, trainable_layers_group=layers)
 
-    return base_model,change_to_warmstart_scheduler
+    return base_model,change_to_warmstart_scheduler,layers
 
 
 def load_model_for_test(
@@ -107,7 +107,7 @@ def load_model_for_test(
       model.load_state_dict(state_dict)
       
     else:
-        base_model,change_to_warmstart_scheduler=get_parameters_for_lightning_model_inference(
+        base_model,change_to_warmstart_scheduler,layers=get_parameters_for_lightning_model_inference(
             model_dir=model_dir,
              experiment_name=experiment_name,
              device=device
@@ -116,7 +116,8 @@ def load_model_for_test(
         model=Resnet18Lightning.load_from_checkpoint(
             checkpoint_path=os.path.join(f"{model_dir}/{experiment_name}",f"{experiment_name}_weight.ckpt"),
             model=base_model,
-            change_to_warmstart_scheduler=change_to_warmstart_scheduler
+            change_to_warmstart_scheduler=change_to_warmstart_scheduler,
+            layers=layers
             )
         
     return model
