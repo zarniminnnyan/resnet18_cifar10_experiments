@@ -195,7 +195,7 @@ def lightning_trainer(
     print("Executing finetuning resnet18 code .... ")
 
     # TQDM bar
-    bar = TQDMProgressBar(refresh_rate=200)
+    bar = TQDMProgressBar(refresh_rate=600)
 
     #Set Logger for saving logs
     csv_Logger=CSVLogger(save_dir=logs_dir,name=logger_filename)
@@ -212,7 +212,7 @@ def lightning_trainer(
         max_epochs=num_epochs,
         accelerator="auto",
         devices=1,
-        enable_progress_bar=True,
+        enable_progress_bar=False,
         precision="32-true",
         logger=csv_Logger,
         callbacks=[bar] + callbacks
