@@ -153,6 +153,7 @@ def test_model(
   os.makedirs(test_result_dir,exist_ok=True)
 
   test_acc=metrics.Accuracy(task="multiclass",num_classes=num_classes).to(device)
+  cm_metric =metrics.ConfusionMatrix(task="multiclass", num_classes=num_classes).to(device)
   test_acc.reset()
 
 
@@ -181,15 +182,20 @@ def test_model(
       total_loss +=loss.item()
       #update the test acc in val accuracy metrics
       test_acc.update(outputs,label)
+      #update the cm metric
+      cm_metric.update(outputs,label)
 
   #compute accuracy
   total_test_accuracy=test_acc.compute().item()*100
+  #compute confusion matrix
+  conf_matrix = cm_metric.compute()
   #compute total loss
   total_test_loss=total_loss/len(test_dataloader)
 
   test_history={
     "test_acc":total_test_accuracy,
-    "test_loss":total_test_loss
+    "test_loss":total_test_loss,
+    "conf_matrix":conf_matrix
   }
 
   torch.save(

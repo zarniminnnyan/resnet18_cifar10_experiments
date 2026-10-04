@@ -1,4 +1,3 @@
-from sympy.parsing.sympy_parser import Max
 from torchvision import transforms
 from typing import Optional
 import matplotlib.pyplot as plt
@@ -130,10 +129,11 @@ def confusion_matrix_plot(final_matrix,classes_name_list:list, experiment_name:s
   
   """
 
-  plt.figure(figsize=(6, 5))
+  plt.figure(figsize=(8,8))
   sns.heatmap(
     final_matrix,
     annot=True,
+    fmt="d", 
     xticklabels=classes_name_list,
     yticklabels=classes_name_list
     )
@@ -158,19 +158,21 @@ def each_class_accuracy(final_matrix,classes_name_list:list,experiment_name:str)
       - the plot for per class accuracy
   """
 
-  plt.figure(figsize=(6,5))
-  
+  if isinstance(final_matrix, torch.Tensor):
+    final_matrix = final_matrix.cpu().numpy()
+
+  plt.figure(figsize=(12,8))
   #calculate the per class acurracy based on True positives/total samples in each class 
   per_class_acc=np.diag(final_matrix)/np.sum(final_matrix,axis=1) #adding samples accross columns  
 
-  plt.bar(classes_name_list,per_class_acc)
-  plt.xlabel("class names")
-  plt.ylabel("per class accuarcy")
-  plt.title(f"Per Class accuracy plot for {experiment_name}")
+  plt.bar(classes_name_list,per_class_acc,width=0.9,color="darkred")
+  plt.xlabel("class names",fontsize=14)
+  plt.ylabel("per class accuarcy",fontsize=14)
+  plt.title(f"Per Class accuracy plot for {experiment_name}",fontsize=14)
   #adding text just above its accuracy 
   for i,v in enumerate(per_class_acc): 
-    plt.text(i,v+0.02,f"{v:.2f}") 
-
+    plt.text(i,v+0.03,f"{v*100:.2f}") 
+  plt.ylim(0,1.1)
   plt.show()
 
 
