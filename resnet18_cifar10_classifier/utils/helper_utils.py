@@ -12,18 +12,23 @@ from torchvision.datasets import CIFAR10
 from torchvision.models import resnet18,ResNet18_Weights
 from torchvision.transforms import v2
 from torch.utils.data import (
+    Subset,
     DataLoader,
     Dataset,
     default_collate,
     random_split
     )
 
+from sklearn.metrics import log_loss
+from tqdm.auto import tqdm
+import torchvision.transforms as transform
+import torch.nn as nn
+import numpy as np
 import torch
 import tempfile
 import time 
 import os 
 
-import torchvision.transforms as transform
 
 
 
@@ -438,3 +443,102 @@ def measure_inference_time(model,device,input_shape,warm_up_runs=10,num_runs=100
         #Calculate avg time with average formula and then convert it into miilliseconds
         avg_time=total_timings/timings_size*1000
         return avg_time
+
+
+@torch.no_grad()
+def calibrate_eval_model(model:nn.Module,val_dataset:Callable,batch_size:int,device:torch.device,split_size:int,bins_size:int):
+    """
+
+    Args:
+         model (nn.Module): the evaluation model which has been saved from the best checkpoint
+         val_dataset (Callable): Validation dataset
+
+    Returns: 
+
+    """
+    def calculate_ece(y_true, y_prob, n_bins=bins_size):
+        """
+        Calculate Expected Calibration Error (ECE) for multiclass classification.
+
+        Parameters:
+            y_true: true class labels, shape (N,)
+            y_prob: predicted probabilities, shape (N, num_classes)
+            n_bins: number of confidence bins
+
+        Returns:
+            ece: Expected Calibration Error
+        """
+
+        # Predicted class and confidence
+        y_pred = np.argmax(y_prob, axis=1)
+        confidence = np.max(y_prob, axis=1)
+
+        # 1 if prediction is correct, otherwise 0
+        correct = (y_pred == y_true).astype(float)
+
+        # Create confidence bins
+        bins = np.linspace(0, 1, n_bins + 1)
+
+        ece = 0.0
+
+        for bin_lower, bin_upper in zip(bins[:-1], bins[1:]):
+
+            # Find predictions inside this confidence bin
+            mask = (confidence >= bin_lower) & (confidence < bin_upper)
+
+            if np.sum(mask) > 0:
+
+                # Average confidence in this bin
+                bin_conf = np.mean(confidence[mask])
+
+                # Actual accuracy in this bin
+                bin_acc = np.mean(correct[mask])
+
+                # Weighted calibration error
+                ece += np.abs(bin_conf - bin_acc) * np.sum(mask)
+
+        # Normalize by total number of predictions
+        ece /= len(y_true)
+
+        return ece
+    
+    batch_y_probs=[]
+    batch_y_true=[]
+    calibrated_error={}
+
+    model.eval()
+
+    np.random.seed(42)
+    #calibrate indices
+    calibrate_indices=np.random.choice(len(val_dataset),size=split_size,replace=False)
+    #calibrate dataloader 
+    calibrate_dataset=Subset(val_dataset,calibrate_indices)
+    calibrate_dataloader=tqdm(
+        DataLoader(calibrate_dataset,batch_size=batch_size,shuffle=False),
+        desc="Model Calibration is in process"
+        )
+
+    for img,targets in calibrate_dataloader: 
+
+        #send the img and label to the device
+        image,label=img.to(device),targets.to(device)
+        #input to model
+        outputs=model(image)
+        #output probability 
+        output_prob=torch.softmax(outputs,dim=1)
+        #append the probs into the list 
+        batch_y_probs.append(output_prob)
+        #append the targets into the list 
+        batch_y_true.append(label)
+
+    y_probs=torch.cat(batch_y_probs,dim=0).detach().cpu().numpy()
+    y_true=torch.cat(batch_y_true,dim=0).detach().cpu().numpy()
+
+    print(f"y probs shape: {y_probs.shape}")
+    print(f"y true shape: {y_true.shape}")
+
+    calibrated_error["Log Loss"]=log_loss(y_true,y_probs)
+    calibrated_error["ECE"]=calculate_ece(y_true,y_probs)
+    
+
+    return calibrated_error,y_probs,y_true
