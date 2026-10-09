@@ -1,5 +1,6 @@
 from torchvision import transforms
 from typing import Optional
+from typing import List
 import matplotlib.pyplot as plt
 import seaborn as sns 
 import numpy as np 
@@ -289,8 +290,85 @@ def extract_dataframe(df):
     return extracted_df 
 
 
+def visualize_per_class_classification_report(
+  precision:List,
+  recall:List,
+  f1_score:List,
+  dataset_classes:List,
+  experiment_name:str
+  ):
 
+  """
+  Visualize the per class F1 score/Precision/Recall
 
+  Args: 
+    precision (List): List of precision w.r.t classes 
+    recall (List): List of recall w.r.t classes 
+    f1_score (List): List of f1_score w.r.t classes 
+    dataset_classes (List): List of dataset classes 
+    experiment_name (str): Experiment name
+
+  Returns: 
+    Plot of per class F1 Score/ Precision/ Recall
+  """
+  x= np.arange(len(dataset_classes)) #The bar groups
+  width = 0.25  #the gap between each group
+
+  #set white theme
+  plt.style.use('default')
+  fig, ax = plt.subplots(figsize=(14, 7.5), facecolor='white')
+  ax.set_facecolor('white')
+
+  # Color Palette for 3 metrics
+  colors = {
+        'precision': '#008080',  # Teal
+        'recall':    '#FF6F61',  # Coral
+        'f1_score':  '#6B5B95'   # Slate Purple
+    }
+
+  # Plot the 3 bars (Precision,Recall,F1-Score)
+  rects1 = ax.bar(x - width, precision, width, label='Precision', color=colors['precision'])
+  rects2 = ax.bar(x,recall,    width, label='Recall',    color=colors['recall'])
+  rects3 = ax.bar(x + width, f1_score,  width, label='F1-Score',  color=colors['f1_score'])
+
+  #  Format labels, title, and grid axes
+  ax.set_ylabel('Score (%)', fontsize=12, color='#2d3436')
+  ax.set_title(f'Per-Class Precision / Recall / F1-Score – Test Set of {experiment_name}', fontsize=14, pad=15, color='#2d3436', weight='bold')
+  ax.set_xticks(x)
+  ax.set_xticklabels(dataset_classes, rotation=15, fontsize=10, color='#2d3436')
+
+  # Y-Axis limit and light grey gridlines
+  ax.set_ylim(80, 102)
+  ax.tick_params(colors='#2d3436')
+  ax.grid(axis='y', linestyle=':', color='#b2bec3', alpha=0.7)
+
+  # Place the legend
+  ax.legend(loc='upper left', frameon=True, facecolor='white', edgecolor='#dfe6e9')
+
+  # Add color-matched text labels on top of the bars
+  def autolabel(rects, label_color):
+        for rect in rects:
+            height = rect.get_height()
+            ax.annotate(f'{height:.1f}%',
+                        xy=(rect.get_x() + rect.get_width() / 2, height),
+                        xytext=(0, 4),
+                        textcoords="offset points",
+                        ha='center', va='bottom', 
+                        fontsize=8, rotation=90,
+                        color=label_color, weight='semibold')
+
+  autolabel(rects1, colors['precision'])
+  autolabel(rects2, colors['recall'])
+  autolabel(rects3, colors['f1_score'])
+
+  # Clean borders
+  for spine in ['top', 'right']:
+      ax.spines[spine].set_visible(False)
+  for spine in ['left', 'bottom']:
+      ax.spines[spine].set_color('#2d3436')
+
+  plt.tight_layout()
+  plt.show()
 
 
 

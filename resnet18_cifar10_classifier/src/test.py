@@ -5,6 +5,7 @@ import torch.nn.functional as F
 import torchmetrics.classification as metrics
 import torch.nn as nn
 import torch
+import pickle
 import os
 
 
@@ -154,12 +155,17 @@ def test_model(
 
   test_acc=metrics.Accuracy(task="multiclass",num_classes=num_classes).to(device)
   cm_metric =metrics.ConfusionMatrix(task="multiclass", num_classes=num_classes).to(device)
+  test_f1score=metrics.F1Score(task="multiclass",num_classes=num_classes,average=None).to(device)
+  test_precision=metrics.Precision(task="multiclass",num_classes=num_classes,average=None).to(device)
+  test_recall=metrics.Recall(task="multiclass",num_classes=num_classes,average=None).to(device)
   test_acc.reset()
+  test_f1score.reset()
+  test_precision.reset()
+  test_recall.reset()
 
 
   #total loss
   total_loss=0.0
-
 
   #pass dataloader into tqdm
   test_dataloader=tqdm(test_dataloader,desc="test model is in progress")
@@ -184,24 +190,37 @@ def test_model(
       test_acc.update(outputs,label)
       #update the cm metric
       cm_metric.update(outputs,label)
+      #update test precision 
+      test_precision.update(outputs,label)
+      #update the test f1 score 
+      test_f1score.update(outputs,label)
+      #update the test recall
+      test_recall.update(outputs,label)
 
   #compute accuracy
   total_test_accuracy=test_acc.compute().item()*100
+  #compute precision 
+  total_test_precision=test_precision.compute().cpu().numpy()*100
+  #compute f1 score 
+  total_test_f1_score=test_f1score.compute().cpu().numpy()*100
+  #compute recall 
+  total_test_recall=test_recall.compute().cpu().numpy()*100
   #compute confusion matrix
-  conf_matrix = cm_metric.compute()
+  conf_matrix = cm_metric.compute().cpu().numpy()
   #compute total loss
   total_test_loss=total_loss/len(test_dataloader)
 
   test_history={
     "test_acc":total_test_accuracy,
     "test_loss":total_test_loss,
-    "conf_matrix":conf_matrix
+    "conf_matrix":conf_matrix,
+    "precision":total_test_precision,
+    "f1score":total_test_f1_score,
+    "recall":total_test_recall
   }
-
-  torch.save(
-    test_history,
-    f"{test_result_dir}/test_history.pth"
-  )
+  #saved with pickle because it is much cleaner than torch.save() due to numpy() arrays
+  with open(f"{test_result_dir}/test_history.pkl", "wb") as f:
+    pickle.dump(test_history, f)
 
 
   return test_history

@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 import torch
+import os
 
 
 
@@ -56,7 +57,7 @@ def calibrate_eval_model(models:dict, val_dataset, batch_size:int, device:torch.
     calibrate_dataset = Subset(val_dataset, calibrate_indices)
 
     for model_name, model in models.items():
-        model.eval()
+        model.eval().to(device)
         logits_list, labels_list = [], []
         calibrate_dataloader = tqdm(
             DataLoader(calibrate_dataset, batch_size=batch_size, shuffle=False),
@@ -106,6 +107,15 @@ def calibrate_eval_model(models:dict, val_dataset, batch_size:int, device:torch.
         nll_after = nll_criterion(scaled_logits, labels).item()
         ece_after, bin_conf_after, bin_acc_after = calculate_ece(y_true, y_probs_after)
         logloss_after = log_loss(y_true, y_probs_after)
+        # make directory if no exists
+        os.makedirs("./temperature",exist_ok=True)
+
+        #save the optimized temperature 
+        torch.save({
+            "optimized_temperature":temperature.item()
+        },
+        os.path.join("./temperature",f"temperature_{model_name}.pth")
+        )
 
         results.append({
             "model_name": model_name,
