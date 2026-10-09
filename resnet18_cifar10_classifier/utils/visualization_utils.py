@@ -342,7 +342,7 @@ def visualize_per_class_classification_report(
     ax.set_xticklabels(dataset_classes, rotation=15, fontsize=10, color='#2d3436')
 
     # Y-Axis limit and light grey gridlines
-    ax.set_ylim(80, 102)
+    ax.set_ylim(0, 102)
     ax.tick_params(colors='#2d3436')
     ax.grid(axis='y', linestyle=':', color='#b2bec3', alpha=0.7)
 
