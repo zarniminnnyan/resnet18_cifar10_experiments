@@ -6,6 +6,7 @@ import torchmetrics.classification as metrics
 import torch.nn as nn
 import torch
 import pickle
+import numpy as np
 import os
 
 
@@ -158,10 +159,14 @@ def test_model(
   test_f1score=metrics.F1Score(task="multiclass",num_classes=num_classes,average=None).to(device)
   test_precision=metrics.Precision(task="multiclass",num_classes=num_classes,average=None).to(device)
   test_recall=metrics.Recall(task="multiclass",num_classes=num_classes,average=None).to(device)
+  test_acc_per_class=metrics.Recall(task="multiclass",num_classes=num_classes,average=None).to(device)
+
+  # reset the metrics 
   test_acc.reset()
   test_f1score.reset()
   test_precision.reset()
   test_recall.reset()
+  test_acc_per_class.reset()
 
 
   #total loss
@@ -188,6 +193,8 @@ def test_model(
       total_loss +=loss.item()
       #update the test acc in val accuracy metrics
       test_acc.update(outputs,label)
+      #test acc per class 
+      test_acc_per_class.update(outputs,label)
       #update the cm metric
       cm_metric.update(outputs,label)
       #update test precision 
@@ -198,20 +205,23 @@ def test_model(
       test_recall.update(outputs,label)
 
   #compute accuracy
-  total_test_accuracy=test_acc.compute().item()*100
-  #compute precision 
-  total_test_precision=test_precision.compute().cpu().numpy()*100
-  #compute f1 score 
-  total_test_f1_score=test_f1score.compute().cpu().numpy()*100
-  #compute recall 
-  total_test_recall=test_recall.compute().cpu().numpy()*100
+  total_test_accuracy=f"{test_acc.compute().item()*100:.2f}"
+  #compute per class test accuracy 
+  total_test_per_class_acc=np.round(test_acc_per_class.compute().cpu().numpy()*100,2)
+  #compute per class precision 
+  total_test_precision=np.round(test_precision.compute().cpu().numpy()*100,2)
+  #compute per class f1 score 
+  total_test_f1_score=np.round(test_f1score.compute().cpu().numpy()*100,2)
+  #compute per class recall 
+  total_test_recall=np.round(test_recall.compute().cpu().numpy()*100,2)
   #compute confusion matrix
   conf_matrix = cm_metric.compute().cpu().numpy()
   #compute total loss
-  total_test_loss=total_loss/len(test_dataloader)
+  total_test_loss=f"{total_loss/len(test_dataloader):.2f}"
 
   test_history={
     "test_acc":total_test_accuracy,
+    "test_per_class_acc":total_test_per_class_acc,
     "test_loss":total_test_loss,
     "conf_matrix":conf_matrix,
     "precision":total_test_precision,

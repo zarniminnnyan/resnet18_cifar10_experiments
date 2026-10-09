@@ -128,7 +128,13 @@ def split_dataset(raw_dataset,train_transform,val_transform):
 
 
 
-def load_prepare_cifar10(dataset_path:str,build_transforms:Callable,image_size:int,standard_aug:bool,add_random_erasing:bool):
+def load_prepare_cifar10(
+    dataset_path:str,
+    build_transforms:Callable,
+    image_size:int,
+    standard_aug:bool,
+    add_random_erasing:bool
+    ):
     """
     This function is for downloading the cifar10 dataset 
 
