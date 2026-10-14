@@ -1,4 +1,4 @@
-from typing import Callable,List,Dict 
+from typing import Callable,Tuple
 from config.exp_config import (
     cifar10_classes,
     seed,
@@ -20,6 +20,7 @@ from torch.utils.data import (
 
 import torchvision.transforms as transform
 import torch
+import torch.nn as nn
 import tempfile
 import time 
 import os 
@@ -360,7 +361,7 @@ def build_dataloader(
   return train_dataloader,val_dataloader,test_dataloader
 
 
-def get_model_size(model):
+def get_model_size(model,save_path:str,experiment_name:str):
 
     """
     Create the temporary file path to store model with tempfile
@@ -368,11 +369,18 @@ def get_model_size(model):
 
     Args:
     model: Resnet18 Pretrained model
+    save_path (str): path for saving model size in dict
+    experiment_name (str): Name of experiment
+
 
     Return:
     size_mb: convert the model size bytes to MB
 
     """
+    #create save path if not exists
+    os.makedirs(save_path,exist_ok=True)
+    save_mb_dir=os.path.join(save_path,f"{experiment_name}_MB.pth")
+
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pth") as tempFile:
         tempfile_path = tempFile.name
 
@@ -385,6 +393,13 @@ def get_model_size(model):
 
         #Get model size in Bytes to MB
         size_mb = model_size_bytes / (1024 * 1024)
+        #save size MB 
+        torch.save({
+            "model_size":size_mb
+        },
+        save_mb_dir
+        )
+
     except Exception as e:
         print(f"Failed measuring the model size due to {e}")
 
@@ -396,24 +411,37 @@ def get_model_size(model):
     return size_mb
 
 
-def measure_inference_time(model,device,input_shape,warm_up_runs=10,num_runs=100):
+def measure_inference_time(
+    model:nn.Module,
+    input_shape:Tuple[int],
+    save_path:str,
+    experiment_name:str,
+    warm_up_runs=10,
+    num_runs=100
+    ):
     """
     Measure the inference time of baseline model and  Fine-tuned Resnet50
 
     Args: 
      model (nn.Module): pretrained resnet18 model 
-     device (torch.device): cpu or gpu
      input_shape: the image input for model (eg. (1,3,224,224))
+     save_path: Save path for model time measurement in dict 
+     experiment_name (str): Experiment name 
      warm_up_runs: number of warm-up iterations (default 10)
      num_runs: number of timed runs (default 100)
 
     Returns:
     avg_time: Average inference timing of the model
     """
+
+    #create save path if not exists
+    os.makedirs(save_path,exist_ok=True)
+    save_time_dir=os.path.join(save_path,f"{experiment_name}_time.pth")
     #Create sample input data
-    sample_input=torch.rand(input_shape).to(device)
+    sample_input=torch.rand(input_shape).to("cpu")
     #set eval mode
     model.eval()
+    model.to("cpu")
     #Run warmup for initializing  system caches and operations
     with torch.no_grad():
         for _ in range(warm_up_runs):
@@ -422,19 +450,10 @@ def measure_inference_time(model,device,input_shape,warm_up_runs=10,num_runs=100
     timings=[]
     with torch.no_grad():
         for _ in range(num_runs):
-
-            #let GPU finishes the work before time was recorded
-
-            if device.type=="cuda":
-                torch.cuda.synchronize()
             #Record start time
             time_start=time.perf_counter()
             #feed sample data to the model
             model(sample_input)
-            #GPU is runing asynchronous, let the GPU finishes the work before the time was recorded
-            if device.type=="cuda":
-                torch.cuda.synchronize()
-
             time_end=time.perf_counter()
             #get the time in seconds and calculate the differences
             timings.append(time_end-time_start)
@@ -443,5 +462,12 @@ def measure_inference_time(model,device,input_shape,warm_up_runs=10,num_runs=100
         total_timings=sum(timings)
         #Calculate avg time with average formula and then convert it into miilliseconds
         avg_time=total_timings/timings_size*1000
+        #save the time in milliseconds 
+        torch.save(
+            {
+            "model_time":avg_time
+            },
+            save_time_dir
+        )
         return avg_time
 

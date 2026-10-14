@@ -32,6 +32,7 @@ data/
 *.gz
 
 # Model artifacts
+*.pkl
 *.pth
 *.pt
 *.onnx
