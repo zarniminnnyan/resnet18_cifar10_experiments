@@ -1,6 +1,6 @@
 
 #define the dataset directory
-dataset_dir="./data/cifar10"
+dataset_dir="/kaggle/input/datasets/zarniminnnyan/my-data/data"
 
 #metrics_logs_dir 
 logs_dir="./main_model_logs/logs"
