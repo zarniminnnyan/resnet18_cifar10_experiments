@@ -177,9 +177,11 @@ def test_model(
 
 
  #send model to the device and set the eval mode
+  try:
+    model.eval()
+  except NotImplementedError: 
+    torchao.quantization.pt2e.move_exported_model_to_eval(model)
   model.to(device)
-  model.eval()
-
   #turn off the updating gradients
   with torch.no_grad():
 
