@@ -28,7 +28,7 @@ runs/
 
 # Data
 results/
-result/
+notebook/result/
 data/
 *.zip
 *.tar
@@ -53,11 +53,5 @@ Thumbs.db
 build/
 dist/
 *.egg-info/
-
-# Lightning AI Studio / Remote servers
-.idea/
 .vscode/
-.lightning_studio/
-.vscode-server/
-.cursor-server/
-.windsurf-server/
+
