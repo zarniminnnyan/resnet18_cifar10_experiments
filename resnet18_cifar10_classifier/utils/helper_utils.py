@@ -21,13 +21,10 @@ from torch.utils.data import (
 import torchvision.transforms as transform
 import torch
 import torch.nn as nn
-import tempfile
+import torchao
 import time 
 import os 
-
-
-
-
+import io
 
 
 class TransformSubset(Dataset):
@@ -360,114 +357,80 @@ def build_dataloader(
 
   return train_dataloader,val_dataloader,test_dataloader
 
-
-def get_model_size(model,save_path:str,experiment_name:str):
-
-    """
-    Create the temporary file path to store model with tempfile
-    Get model size in MB
-
-    Args:
-    model: Resnet18 Pretrained model
-    save_path (str): path for saving model size in dict
-    experiment_name (str): Name of experiment
-
-
-    Return:
-    size_mb: convert the model size bytes to MB
-
-    """
-    #create save path if not exists
-    os.makedirs(save_path,exist_ok=True)
-    save_mb_dir=os.path.join(save_path,f"{experiment_name}_MB.pth")
-
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".pth") as tempFile:
-        tempfile_path = tempFile.name
+def measure_inference_mb_ms(
+    model: nn.Module,
+    input_shape: Tuple[int, ...],
+    save_path: str,
+    experiment_name: str,
+    device: torch.device,
+    is_production:bool,
+    warm_up_runs: int = 10,
+    num_runs: int = 100,
+    exported_file_path: str | None = None,
+):
+    os.makedirs(save_path, exist_ok=True)
 
     try:
-        #Save model dict
-        torch.save(model.state_dict(), tempfile_path)
+        model.eval()
+    except NotImplementedError: 
+        torchao.quantization.pt2e.move_exported_model_to_eval(model)
+        
+    model.to(device)
 
-        #Get Resnet18 pretrained model size in bytes
-        model_size_bytes = os.path.getsize(tempfile_path)
+    sample_input = torch.rand(input_shape, device=device)
 
-        #Get model size in Bytes to MB
-        size_mb = model_size_bytes / (1024 * 1024)
-        #save size MB 
-        torch.save({
-            "model_size":size_mb
-        },
-        save_mb_dir
-        )
-
-    except Exception as e:
-        print(f"Failed measuring the model size due to {e}")
-
-    finally:
-        #check if file path still exists
-        if os.path.exists(tempfile_path):
-            #Remove temporary file path
-            os.remove(tempfile_path)
-    return size_mb
-
-
-def measure_inference_time(
-    model:nn.Module,
-    input_shape:Tuple[int],
-    save_path:str,
-    experiment_name:str,
-    warm_up_runs=10,
-    num_runs=100
-    ):
-    """
-    Measure the inference time of baseline model and  Fine-tuned Resnet50
-
-    Args: 
-     model (nn.Module): pretrained resnet18 model 
-     input_shape: the image input for model (eg. (1,3,224,224))
-     save_path: Save path for model time measurement in dict 
-     experiment_name (str): Experiment name 
-     warm_up_runs: number of warm-up iterations (default 10)
-     num_runs: number of timed runs (default 100)
-
-    Returns:
-    avg_time: Average inference timing of the model
-    """
-
-    #create save path if not exists
-    os.makedirs(save_path,exist_ok=True)
-    save_time_dir=os.path.join(save_path,f"{experiment_name}_time.pth")
-    #Create sample input data
-    sample_input=torch.rand(input_shape).to("cpu")
-    #set eval mode
-    model.eval()
-    model.to("cpu")
-    #Run warmup for initializing  system caches and operations
-    with torch.no_grad():
+    # Warm-up
+    with torch.inference_mode():
         for _ in range(warm_up_runs):
             model(sample_input)
 
-    timings=[]
-    with torch.no_grad():
-        for _ in range(num_runs):
-            #Record start time
-            time_start=time.perf_counter()
-            #feed sample data to the model
-            model(sample_input)
-            time_end=time.perf_counter()
-            #get the time in seconds and calculate the differences
-            timings.append(time_end-time_start)
-        #Get the total size and total of the timings
-        timings_size=len(timings)
-        total_timings=sum(timings)
-        #Calculate avg time with average formula and then convert it into miilliseconds
-        avg_time=total_timings/timings_size*1000
-        #save the time in milliseconds 
-        torch.save(
-            {
-            "model_time":avg_time
-            },
-            save_time_dir
-        )
-        return avg_time
+    if device.type == "cuda":
+        torch.cuda.synchronize()
 
+    # Benchmark
+    timings = []
+
+    with torch.inference_mode():
+        for _ in range(num_runs):
+            if device.type == "cuda":
+                torch.cuda.synchronize()
+
+            start = time.perf_counter()
+            model(sample_input)
+
+            if device.type == "cuda":
+                torch.cuda.synchronize()
+
+            timings.append(time.perf_counter() - start)
+
+    avg_time_ms = sum(timings) / len(timings) * 1000
+
+    # Measure serialized state_dict size
+    buffer = io.BytesIO()
+    torch.save(model.state_dict(), buffer)
+    state_size_mb = buffer.tell() / 1e6
+
+    # Measure the actual exported artifact (Optional)
+    artifact_size_mb = None
+    if exported_file_path is not None:
+        artifact_size_mb = os.path.getsize(exported_file_path) / 1e6
+
+    results = {
+        "model_time_ms":avg_time_ms,
+        "state_dict_size_mb":state_size_mb,
+        "exported_file_size_mb": artifact_size_mb,
+    }
+
+    if not is_production:
+        save_file = os.path.join(
+            save_path, f"{experiment_name}_metrics.pth"
+              )
+        torch.save(results, save_file)
+
+    print(f"Average latency: {avg_time_ms:.3f} ms")
+    print(f"State dict size: {state_size_mb:.2f} MB")
+
+    if artifact_size_mb is not None:
+        print(f"Exported artifact size: {artifact_size_mb:.2f} MB")
+
+    return results

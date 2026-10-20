@@ -5,6 +5,9 @@ __pycache__/
 *.pyd
 *.so
 
+# Gradio session/config file
+.gradio/
+
 # Virtual environments
 .env
 .venv/
