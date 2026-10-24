@@ -1,4 +1,4 @@
-from typing import Callable,Tuple
+from typing import Callable,Tuple,Any
 from config.exp_config import (
     cifar10_classes,
     seed,
@@ -357,25 +357,36 @@ def build_dataloader(
 
   return train_dataloader,val_dataloader,test_dataloader
 
+
 def measure_inference_mb_ms(
-    model: nn.Module,
+    model: Any,  # Can be nn.Module, ExportedProgram, or an AOTInductor runner
     input_shape: Tuple[int, ...],
     save_path: str,
     experiment_name: str,
+    is_production: bool,
     device: torch.device,
-    is_production:bool,
     warm_up_runs: int = 10,
     num_runs: int = 100,
     exported_file_path: str | None = None,
 ):
     os.makedirs(save_path, exist_ok=True)
 
-    try:
-        model.eval()
-    except NotImplementedError: 
-        torchao.quantization.pt2e.move_exported_model_to_eval(model)
-        
-    model.to(device)
+    # Device and Mode Configuration safely adapted for AOTInductor
+    if isinstance(model, nn.Module):
+        try:
+            model.eval()
+            model.to(device)
+        except NotImplementedError: 
+            torchao.quantization.pt2e.move_exported_model_to_eval(model)
+            model.to(device)
+    else:
+        # AOTInductor models are already compiled for a specific device/mode.
+        # Fall back gracefully if it exposes PyTorch 2.0 graph structures.
+        if hasattr(model, "eval"):
+            try:
+                model.eval()
+            except Exception:
+                pass
 
     sample_input = torch.rand(input_shape, device=device)
 
@@ -405,32 +416,38 @@ def measure_inference_mb_ms(
 
     avg_time_ms = sum(timings) / len(timings) * 1000
 
-    # Measure serialized state_dict size
-    buffer = io.BytesIO()
-    torch.save(model.state_dict(), buffer)
-    state_size_mb = buffer.tell() / 1e6
+    # Safely measure state_dict size only if it exists
+    state_size_mb = None
+    if hasattr(model, "state_dict") and callable(getattr(model, "state_dict")):
+        buffer = io.BytesIO()
+        torch.save(model.state_dict(), buffer)
+        state_size_mb = buffer.tell() / 1e6
 
-    # Measure the actual exported artifact (Optional)
+    # Optionally measure the actual exported artifact (.pt2 file)
     artifact_size_mb = None
-    if exported_file_path is not None:
+    if exported_file_path is not None and os.path.exists(exported_file_path):
         artifact_size_mb = os.path.getsize(exported_file_path) / 1e6
 
     results = {
-        "model_time_ms":avg_time_ms,
-        "state_dict_size_mb":state_size_mb,
+        "model_time_ms": avg_time_ms,
+        "state_dict_size_mb": state_size_mb,
         "exported_file_size_mb": artifact_size_mb,
     }
 
     if not is_production:
         save_file = os.path.join(
             save_path, f"{experiment_name}_metrics.pth"
-              )
+        )
         torch.save(results, save_file)
 
     print(f"Average latency: {avg_time_ms:.3f} ms")
-    print(f"State dict size: {state_size_mb:.2f} MB")
+    if state_size_mb is not None:
+        print(f"State dict size: {state_size_mb:.2f} MB")
+    else:
+        print("State dict size: N/A (AOTCompiled Module)")
 
     if artifact_size_mb is not None:
         print(f"Exported artifact size: {artifact_size_mb:.2f} MB")
 
     return results
+
