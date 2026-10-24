@@ -1,5 +1,6 @@
 import os
 import torch
+import torchao
 import torch.nn as nn
 import torchvision.transforms as transforms
 from PIL import Image
