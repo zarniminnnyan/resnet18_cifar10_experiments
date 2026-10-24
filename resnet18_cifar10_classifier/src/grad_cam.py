@@ -112,7 +112,25 @@ def process_input_image(
         Predicts top-1 class info and creates a top-5 dictionary of {class_name: confidence}.
         """
         with torch.no_grad():
-            model.eval().to(device)
+            if isinstance(model, nn.Module):
+                try:
+                    model.eval()
+                    model.to(device)
+                except NotImplementedError: 
+                    torchao.quantization.pt2e.move_exported_model_to_eval(model)
+                    model.to(device)
+           else:
+               # AOTInductor models are already compiled for a specific device/mode.
+               # Fall back gracefully if it exposes PyTorch 2.0 graph structures.
+               if hasattr(model, "eval"):
+                   try:
+                       model.eval()
+                   except Exception:
+                       pass
+              
+           # AOTICompiledModel:
+           # No .eval(), .to(), or PT2E mode conversion needed here.
+           # The device is determined when the model is compiled/loaded.
             outputs = model(input_tensor)
             
             T = load_calibrated_temperature_helper()
