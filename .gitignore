@@ -23,6 +23,8 @@ venv/
 logs/
 lightning_logs/
 *.ckpt
+*.pkl  
+*.pt2 
 checkpoints/
 runs/
 
