@@ -1,5 +1,6 @@
 from sklearn.metrics import log_loss
 from torch.utils.data import Subset,DataLoader
+from torchao.quantization.pt2e import move_exported_model_to_eval
 from tqdm.auto import tqdm
 from typing import List,Dict 
 import torch.nn as nn
@@ -9,6 +10,7 @@ import numpy as np
 import math
 import torch
 import os
+
 
 
 
@@ -57,7 +59,12 @@ def calibrate_eval_model(models:dict, val_dataset, batch_size:int, device:torch.
     calibrate_dataset = Subset(val_dataset, calibrate_indices)
 
     for model_name, model in models.items():
-        model.eval().to(device)
+        try:
+            model.eval().to(device)
+        except NotImplementedError: 
+            move_exported_model_to_eval(model)
+            model.to(device)
+            
         logits_list, labels_list = [], []
         calibrate_dataloader = tqdm(
             DataLoader(calibrate_dataset, batch_size=batch_size, shuffle=False),
