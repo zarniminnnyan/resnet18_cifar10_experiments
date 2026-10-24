@@ -4,6 +4,7 @@ import torch.nn as nn
 import torchvision.transforms as transforms
 from PIL import Image
 from typing import List
+from typing import Any
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -82,107 +83,84 @@ class GradCAM:
 
 
 def process_input_image(
-    image_path:str,
-    image_name:str,
-    temperature_path:str,
-    gradcam:GradCAM,
-    model:nn.Module,
-    classes:List,
-    experiment_name:str,
-    device:torch.device
-    ):
+    image_path: str,
+    image_name: str,
+    temperature_path: str,
+    gradcam: Any,
+    model: Any,
+    classes: List[str],
+    experiment_name: str,
+    device: torch.device
+):
     """
-    process input image for converting to tensor with ImageNet normalization and shape (224,224)
+    Process input image, apply temperature scaling, calculate top-5 predictions,
+    and generate a Grad-CAM overlay.
 
-    Args: 
-       image_path(str): The path of real world image for testing Grad cam  
-       image_name (str): Name of images (eg. .png,.jpg etc .)
-       gradcam (GradCam Class): The GradCam class
-       model (nn.Module): Resnet18 Model 
-       classes: List of classes 
-       experiment_name (str):Experiment name
-       device (torch.device): cpu or gpu
-
-    Returns: 
-       The overlayed Gram Cam plot on image
+    Returns:
+        tuple: (pred_idx, pred_conf, top5_dict, fig)
     """
-    def load_calibrated_temperature_helper(): 
-
-        """
-        load the calibrated temperature
-
-        Returns: 
-          optimized_temperature: Temperature which was saved during model calibration
-
-        """
-        temp_file=os.path.join(temperature_path,f"temperature_{experiment_name}.pth")
-
+    
+    def load_calibrated_temperature_helper() -> float:
+        temp_file = os.path.join(temperature_path, f"temperature_{experiment_name}.pth")
         if not os.path.exists(temp_file):
             raise FileNotFoundError(f"Temperature file not found: {temp_file}")
-
-        T=torch.load(temp_file)
-        #i have applied .item() for getting scalar when saving
+        T = torch.load(temp_file, map_location=device)
         return T["optimized_temperature"]
 
-    def predict_class_helper(input_tensor:torch.Tensor):
-        
+    def predict_class_helper(input_tensor: torch.Tensor) -> Tuple[int, float, Dict[str, float]]:
         """
-            Predict the class index and confidence score for a given input tensor.
-
-            Args:
-                input_tensor (torch.Tensor): Input image tensor of shape [1, C, H, W].
-
-            Returns:
-                tuple: (pred_idx, pred_conf)
-                    pred_idx (int): Index of the predicted class.
-                    pred_conf (float): Confidence score (probability) of the predicted class.
+        Predicts top-1 class info and creates a top-5 dictionary of {class_name: confidence}.
         """
-
         with torch.no_grad():
-            #model send to device and set eval model 
             model.eval().to(device)
-            outputs=model(input_tensor)
-            #Call temperature helper 
-            T=load_calibrated_temperature_helper()
-            #convert it to probabilites to show confidence score 
-            probs=torch.softmax(outputs/T,dim=1)
-            #get the idx of predicted class 
-            pred_idx=probs.argmax(dim=1).item()
-            #get the confidence score 
-            pred_conf=probs[0,pred_idx].item()
-
-            return pred_idx,pred_conf
-
+            outputs = model(input_tensor)
+            
+            T = load_calibrated_temperature_helper()
+            probs = torch.softmax(outputs / T, dim=1)
+            
+            # Top-1 extraction
+            pred_idx = probs.argmax(dim=1).item()
+            pred_conf = probs[0, pred_idx].item()
+            
+            # Top-K (5) extraction
+            topk_probs, topk_indices = torch.topk(probs, k=5, dim=1)
+            
+            # Flatten to 1D arrays for easy parsing
+            topk_probs = topk_probs[0].tolist()
+            topk_indices = topk_indices[0].tolist()
+            
+            # Construct dictionary mapping class name string to its confidence score
+            top5_dict = {classes[idx]: conf for idx, conf in zip(topk_indices, topk_probs)}
+            
+            return pred_idx, pred_conf, top5_dict
 
     # ---- Preprocess input image ----
     transform = transforms.Compose([
-        transforms.Resize((224,224)),
+        transforms.Resize((224, 224)),
         transforms.ToTensor(),
         transforms.Normalize(
             mean=[0.485, 0.456, 0.406],
             std=[0.229, 0.224, 0.225]
-            ) 
-            ])
+        )
+    ])
     
-    img = Image.open(os.path.join(image_path,image_name)).convert("RGB")
-
-    #apply the transform and add batch 1 at the first dim
+    img = Image.open(os.path.join(image_path, image_name)).convert("RGB")
     input_tensor = transform(img).unsqueeze(0).to(device)
-    #call the predicted class helper 
-    pred_idx,pred_conf=predict_class_helper(input_tensor)
-
-    #Ensure the graph registers gradients for Grad-CAM's backward pass
-    input_tensor.requires_grad_() 
-
+    
+    # Get top-1 and top-5 values
+    pred_idx, pred_conf, top5_predictions = predict_class_helper(input_tensor)
+    
+    # Ensure the graph registers gradients for Grad-CAM's backward pass
+    input_tensor.requires_grad_()
+    
     # ---- Generate Grad-CAM heatmap ----
     heatmap = gradcam.generate(input_tensor)
-
+    
     # ---- Overlay heatmap on image ----
-    fig, ax = plt.subplots() #(this is more convinient to be used in Gradio instead of just plotting in the notebook)
-    ax.set_title(f"Predicted: {classes[pred_idx]} | Confidence: {pred_conf*100:.1f} %",
-          color='green', fontsize=14)
-
-    ax.imshow(np.array(img.resize((224,224))))
+    fig, ax = plt.subplots()
+    ax.set_title(f"Predicted: {classes[pred_idx]} | Confidence: {pred_conf*100:.1f} %", color='green', fontsize=14)
+    ax.imshow(np.array(img.resize((224, 224))))
     ax.imshow(heatmap, cmap='jet', alpha=0.5)
     ax.axis('off')
-    return pred_idx,pred_conf,fig
+    
+    return pred_idx, pred_conf, top5_predictions, fig
