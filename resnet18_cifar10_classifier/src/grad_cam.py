@@ -100,7 +100,7 @@ def process_input_image(
         tuple: (pred_idx, pred_conf, top5_dict, fig)
     """
     
-    def load_calibrated_temperature_helper() -> float:
+    def load_calibrated_temperature_helper():
         temp_file = os.path.join(temperature_path, f"temperature_{experiment_name}.pth")
         if not os.path.exists(temp_file):
             raise FileNotFoundError(f"Temperature file not found: {temp_file}")
