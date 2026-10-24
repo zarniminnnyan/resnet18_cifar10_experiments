@@ -1,6 +1,7 @@
 from src.main_model import Resnet18Lightning,resnet18_main_model_setup
 from tqdm.auto import tqdm
 from torchvision.models import resnet18
+from typing import Any
 import torch.nn.functional as F
 import torchmetrics.classification as metrics
 import torch.nn as nn
@@ -124,11 +125,10 @@ def load_model_for_test(
             )
         
     return model
-
-
+        
 
 def test_model(
-    model:nn.Module,
+    model:Any,
     test_dataloader,
     num_classes:int,
     device:torch.device,
@@ -175,21 +175,37 @@ def test_model(
 
   #pass dataloader into tqdm
   test_dataloader=tqdm(test_dataloader,desc="test model is in progress")
-
-
- #send model to the device and set the eval mode
-  try:
-    model.eval()
-  except NotImplementedError: 
-    torchao.quantization.pt2e.move_exported_model_to_eval(model)
-  model.to(device)
+    
+  if isinstance(model, nn.Module):
+      try:
+          model.eval()
+          model.to(device)
+      except NotImplementedError: 
+          torchao.quantization.pt2e.move_exported_model_to_eval(model)
+          model.to(device)
+  else:
+      # AOTInductor models are already compiled for a specific device/mode.
+      # Fall back gracefully if it exposes PyTorch 2.0 graph structures.
+      if hasattr(model, "eval"):
+          try:
+              model.eval()
+          except Exception:
+              pass
+              
+ # AOTICompiledModel:
+ # No .eval(), .to(), or PT2E mode conversion needed here.
+ # The device is determined when the model is compiled/loaded.
+    
   #turn off the updating gradients
   with torch.no_grad():
 
     for images,labels in test_dataloader:
       img,label=images.to(device),labels.to(device)
       #predict
-      outputs=model(img)
+      outputs=model(
+          img.contiguous(
+            memory_format=torch.channels_last )
+      )
       #loss
       loss=F.cross_entropy(outputs,label)
       #accumulate the loss
