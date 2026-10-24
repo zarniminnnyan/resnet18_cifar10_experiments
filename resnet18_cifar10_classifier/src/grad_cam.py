@@ -107,7 +107,7 @@ def process_input_image(
         T = torch.load(temp_file, map_location=device)
         return T["optimized_temperature"]
 
-    def predict_class_helper(input_tensor: torch.Tensor) -> Tuple[int, float, Dict[str, float]]:
+    def predict_class_helper(input_tensor: torch.Tensor):
         """
         Predicts top-1 class info and creates a top-5 dictionary of {class_name: confidence}.
         """
