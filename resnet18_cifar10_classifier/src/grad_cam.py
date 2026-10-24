@@ -119,7 +119,7 @@ def process_input_image(
                 except NotImplementedError: 
                     torchao.quantization.pt2e.move_exported_model_to_eval(model)
                     model.to(device)
-           else:
+            else:
                # AOTInductor models are already compiled for a specific device/mode.
                # Fall back gracefully if it exposes PyTorch 2.0 graph structures.
                if hasattr(model, "eval"):
