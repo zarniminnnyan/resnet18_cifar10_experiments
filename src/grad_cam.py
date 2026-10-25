@@ -134,7 +134,10 @@ def process_input_image(
            # AOTICompiledModel:
            # No .eval(), .to(), or PT2E mode conversion needed here.
            # The device is determined when the model is compiled/loaded.
-            outputs = model(input_tensor)
+            outputs = model(
+                input_tensor.contiguous(
+                memory_format=torch.channels_last )
+            )
             
             T = load_calibrated_temperature_helper()
 

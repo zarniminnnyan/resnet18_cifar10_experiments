@@ -12,6 +12,7 @@ __pycache__/
 .env
 .venv/
 env/
+myenv/
 venv/
 *.env
 
@@ -41,6 +42,7 @@ data/
 *.pth
 *.pt
 *.onnx
+*.csv
 
 # IDE / Editor files
 .vscode/
