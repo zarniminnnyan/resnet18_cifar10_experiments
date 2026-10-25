@@ -4,6 +4,7 @@ import torchao
 import torch.nn as nn
 import torchvision.transforms as transforms
 from PIL import Image
+from typing import Optional
 from typing import List
 from typing import Any
 import matplotlib.pyplot as plt
@@ -86,7 +87,8 @@ class GradCAM:
 def process_input_image(
     image_path: str,
     image_name: str,
-    temperature_path: str,
+    add_temperature:bool,
+    temperature_path:Optional[str]=None,
     gradcam: Any,
     model: Any,
     classes: List[str],
@@ -135,7 +137,11 @@ def process_input_image(
             outputs = model(input_tensor)
             
             T = load_calibrated_temperature_helper()
-            probs = torch.softmax(outputs / T, dim=1)
+
+            if add_temperature:
+                probs = torch.softmax(outputs / T, dim=1)
+            else:
+                probs = torch.softmax(outputs, dim=1)
             
             # Top-1 extraction
             pred_idx = probs.argmax(dim=1).item()
