@@ -88,12 +88,12 @@ def process_input_image(
     image_path: str,
     image_name: str,
     add_temperature:bool,
-    temperature_path:Optional[str]=None,
     gradcam: Any,
     model: Any,
     classes: List[str],
     experiment_name: str,
-    device: torch.device
+    device: torch.device,
+    temperature_path:Optional[str]=None
 ):
     """
     Process input image, apply temperature scaling, calculate top-5 predictions,
