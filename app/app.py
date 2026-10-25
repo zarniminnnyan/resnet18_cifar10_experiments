@@ -759,7 +759,7 @@ with gr.Blocks(
 ) as demo:
 
     gr.Markdown(
-        "# Production-Ready ResNet18 CIFAR-10 Classifier"
+        "# Production-Ready Grade ResNet18 CIFAR-10 Classifier"
     )
 
     gr.Markdown(
@@ -767,8 +767,8 @@ with gr.Blocks(
         "data augmentation, CutMix, MixUp, and hyperparameter tuning. "
         "It evaluates reliability through ECE, NLL, Log Loss, and temperature "
         "scaling, then explores deployment optimization with QAT and PTQ. "
-        "The model classifies airplane, automobile, bird, cat, deer, dog, "
-        "frog, horse, ship, and truck."
+        "The model classifies **airplane, automobile, bird, cat, deer, dog, "
+        "frog, horse, ship, and truck.**"
     )
 
     with gr.Row(equal_height=False):
@@ -895,7 +895,7 @@ with gr.Blocks(
 
     gr.Markdown(
         "Resnet18 Cifar10 Classifier "
-        "[View Source on GitHub](https://github.com/yourusername)",
+        "[View Source on GitHub](https://github.com/zarniminnnyan/resnet18_cifar10_experiments.git)",
         elem_classes="footer-text",
     )
 
