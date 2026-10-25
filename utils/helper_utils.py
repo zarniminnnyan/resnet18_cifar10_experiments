@@ -17,7 +17,6 @@ from torch.utils.data import (
     default_collate,
     random_split
     )
-
 from typing import Optional
 import torchvision.transforms as transform
 import torch
