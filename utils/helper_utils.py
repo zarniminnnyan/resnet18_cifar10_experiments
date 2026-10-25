@@ -18,6 +18,7 @@ from torch.utils.data import (
     random_split
     )
 
+from typing import Optional
 import torchvision.transforms as transform
 import torch
 import torch.nn as nn
@@ -361,13 +362,13 @@ def build_dataloader(
 def measure_inference_mb_ms(
     model: Any,  # Can be nn.Module, ExportedProgram, or an AOTInductor runner
     input_shape: Tuple[int, ...],
-    save_path: str,
-    experiment_name: str,
     is_production: bool,
     device: torch.device,
     warm_up_runs: int = 10,
     num_runs: int = 100,
     exported_file_path: str | None = None,
+    save_path: Optional[str]=None,
+    experiment_name: Optional[str]=None,
 ):
     os.makedirs(save_path, exist_ok=True)
 

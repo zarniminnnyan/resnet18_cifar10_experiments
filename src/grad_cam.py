@@ -191,4 +191,4 @@ def process_input_image(
     ax.imshow(heatmap, cmap='jet', alpha=0.5)
     ax.axis('off')
     
-    return pred_idx, pred_conf, top5_predictions, fig
+    return pred_idx, pred_conf, top5_predictions, fig,input_tensor
