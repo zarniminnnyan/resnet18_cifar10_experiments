@@ -6,7 +6,7 @@ To improve performance, the model is fine-tuned using transfer learning along wi
 
 Beyond classification accuracy, the project also evaluates the model's confidence and reliability using calibration metrics such as **Expected Calibration Error (ECE), Negative Log-Likelihood (NLL), and Log Loss. Temperature scaling** is applied as a post-processing technique to improve probability calibration and produce more trustworthy predictions.
 
-For deployment, the project investigates multiple optimization strategies to improve CPU inference efficiency, including **Post-Training Quantization (PTQ), Quantization-Aware Training (QAT), `torch.compile()`, and the AOTInductor ahead-of-time compiler**. These techniques are compared to understand the trade-offs between model size, inference speed, and predictive performance.
+For deployment, the project investigates multiple optimization strategies to improve CPU inference efficiency and to be able to deploy edge devices such as mobiles,IoT devices, by optimizing with **Post-Training Quantization (PTQ), Quantization-Aware Training (QAT), `torch.compile()`, and the AOTInductor ahead-of-time compiler**. These techniques are compared to understand the trade-offs between model size, inference speed, and predictive performance.
 
 The final model is capable of classifying images into the ten CIFAR-10 categories: **airplane, automobile, bird, cat, deer, dog, frog, horse, ship, and truck.**
 
@@ -139,6 +139,28 @@ The final model's calibration performance was evaluated using **Expected Calibra
 
 Overall, Exp 5 Version 3 was selected as the best model because it provided the highest classification accuracy and also in test while maintaining excellent calibration performance after temperature scaling.
 
+## Quantization of best candidate Experiment 5 version 3.0 for Efficient CPU Inference and edge devices
 
+To make the model more suitable for deployment, two quantization techniques were explored: **Quantization-Aware Training (QAT)** and **Static Post-Training Quantization (PTQ)**.
+
+**QAT** simulates INT8 quantization during training, allowing the model to learn and adapt to lower-precision computations. Although it requires additional training, it often retains more accuracy after quantization.
+
+**Static PTQ** converts a trained FP32 model to INT8 after training using calibration data. It is simpler and faster to apply because no retraining is required, but this convenience can come at the cost of a larger accuracy drop.
+
+## Model Profiles
+
+| Model | Description | Test Acc (%) | Size (MB) | CPU Latency (ms) | Precision |
+|---------|---------|---------:|---------:|---------:|---------|
+| Baseline | Full-precision reference model | 🏆 94.31 | 44.80 | 19.94 | FP32 |
+| QAT | Quantization-Aware Training | 🥈 92.53 | 11.28 | 🏆 13.45 | INT8 |
+| Static PTQ | Post-Training Quantization | 🥉 91.80 | 11.28 | 13.81 | INT8 |
+
+### Summary
+
+- Both quantized models reduced the model size from **44.80 MB** to **11.28 MB**, a reduction of approximately **75%**.
+- **QAT** achieved higher accuracy than **Static PTQ** while maintaining the same compressed model size.
+- **QAT** also achieved the fastest CPU inference time.
+- The **Baseline** model remained the most accurate, but required substantially more storage and had the highest latency.
+- Overall, **QAT provided the best balance between accuracy, model size, and inference speed for deployment.**
 
 
