@@ -34,7 +34,7 @@ The final model is capable of classifying images into the ten CIFAR-10 categorie
 | Experiment 5 version 2 | + unfreezing layer3 (lr=2e-4)+layer4(lr=3e-4)+ fc(lr=3e-3) | 94.44 | 🏆 +15.44% |
 | Experiment 5 version 3 | + random Erasing augmentation + adding cosine annealing warmstart (replaced standard cosine annealing) | 95.14 | 🏆 +16.14% |
 
-## Per-Class Classification Reports
+## Per-Class Classification Reports of Best candidates (Experiment 5 version 3 and version 3) and Baseline
 <table>
 <tr>
 <td align="center">
@@ -55,4 +55,19 @@ The final model is capable of classifying images into the ten CIFAR-10 categorie
 </td>
 </tr>
 </table>
+
+## Per-Class Accuracy Comparison
+
+| Class | Baseline | Exp 5 V2 | Exp 5 V3 |
+|---------|---------:|---------:|---------:|
+| Airplane | 81.7 | 94.2 | 96.2 |
+| Automobile | 88.1 | 96.3 | 97.1 |
+| Bird | 73.9 | 92.3 | 93.2 |
+| Cat | 63.8 | 86.6 | 88.1 |
+| Deer | 74.6 | 92.0 | 93.7 |
+| Dog | 75.0 | 90.1 | 89.8 |
+| Frog | 82.4 | 97.1 | 96.8 |
+| Horse | 82.1 | 94.4 | 95.3 |
+| Ship | 84.3 | 95.7 | 96.6 |
+| Truck | 86.7 | 95.7 | 96.3 |
 
