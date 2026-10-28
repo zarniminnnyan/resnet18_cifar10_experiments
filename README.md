@@ -166,8 +166,11 @@ To make the model more suitable for deployment, two quantization techniques were
 | QAT | Quantization-Aware Training | 🥈 92.53 | 11.28 | 🏆 13.45 | INT8 |
 | Static PTQ | Post-Training Quantization | 🥉 91.80 | 11.28 | 13.81 | INT8 |
 
-### Compilation after pt2e Quantization is recommended in Pytorch Official Docs. Why?
-> Despite being 75% smaller, the quantized model was initially slower (~56 ms) than the FP32 model (19.94 ms) when executed without compilation. The overhead introduced by quantized operations outweighed the benefits of model compression. After compiling the model with **AOTInductor or JIT 'torch.compile()'**, graph-level optimizations and operator fusion reduced inference latency to 13.45 ms, making the quantized model both smaller and faster.
+### Why Compile After Quantization?
+
+Quantization reduced model size by approximately **75%**, but initially increased CPU latency to ~56 ms compared with 19.94 ms for the FP32 baseline. After applying **`torch.compile()`**, QAT latency dropped to **13.45 ms**.
+
+With **AOTInductor**, measured CPU latency was 42.93 ms for the original FP32 model, 21.51 ms for Static PTQ, and 20.78 ms for QAT. QAT achieved the lowest latency among the three AOT-compiled models in this benchmark. Model artifact sizes were not reported by the current measurement function.
 
 ### Summary
 
