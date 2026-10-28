@@ -45,7 +45,7 @@ Generates new training samples by blending two images and their labels. This act
 
 Random Erasing is a data augmentation technique that randomly masks a small region of an image during training. This encourages the model to rely on multiple visual features rather than specific image regions, improving robustness and reducing overfitting.
 
-## Per-Class Classification Reports of Best candidates (Experiment 5 version 3 and version 3) and Baseline
+## Per-Class Classification Reports of Best candidates (Experiment 5 v 2 and v 3 ) and Baseline
 <table>
 <tr>
 <td align="center">
