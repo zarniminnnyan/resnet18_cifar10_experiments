@@ -115,7 +115,18 @@ The final model's calibration performance was evaluated using **Expected Calibra
   <img src="https://raw.githubusercontent.com/zarniminnnyan/resnet18_cifar10_experiments/main/gallaries/calibration.png" width="850"/>
 </p>
 
+## Temperature Scaling
+
+Temperature scaling adjusts how confident the model is in its predictions without changing the predicted class.
+
+- **T < 1:** Makes predictions more confident, but values that are too small can lead to overconfident predictions.
+- **T > 1:** Spreads confidence across more classes, but values that are too large can make predictions overly uncertain.
+- **Well-tuned T:** Produces a balanced probability distribution, improving confidence reliability and calibration metrics such as ECE, NLL, and Log Loss.
+
+The goal is not to increase accuracy, but to make the model's confidence scores better reflect its actual performance.
+
 ## Calibration Comparison (After Temperature Scaling)
+
 
 | Model | Validation Accuracy (%) | ECE ↓ | Log Loss ↓ | NLL ↓ | Rank |
 |---------|---------:|---------:|---------:|---------:|---------|
