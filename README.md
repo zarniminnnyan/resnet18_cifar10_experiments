@@ -1,3 +1,23 @@
+## Contents
+
+- [Project Overview](#project-overview)
+- [Key Takeaways](#key-takeaways)
+- [Built With](#built-with)
+- [Experiment Comparison](#experiment-comparison)
+- [Data Augmentation Techniques](#data-augmentation-techniques)
+- [Classification Reports](#per-class-classification-reports)
+- [Per-Class Accuracy Comparison](#per-class-accuracy-comparison)
+- [Confusion Matrix Comparison](#confusion-matrix-comparison)
+- [Model Calibration Evaluation](#model-calibration-evaluation)
+- [Model Selection Summary](#model-selection-summary)
+- [Quantization for Efficient CPU Inference](#quantization-for-efficient-cpu-inference)
+- [AOTInductor CPU Latency Comparison](#aotinductor-cpu-latency-comparison)
+- [Summary](#summary)
+
+
+
+
+
 # Project Overview
 
 This project explores how effectively a pretrained ResNet-18 model can be adapted to the CIFAR-10 dataset while preserving its original architecture. Since CIFAR-10 images are only 32×32 pixels, they are resized to 224×224 pixels to match the model's expected input size.
