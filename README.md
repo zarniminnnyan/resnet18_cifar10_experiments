@@ -34,6 +34,17 @@ The final model is capable of classifying images into the ten CIFAR-10 categorie
 | Experiment 5 version 2 | + unfreezing layer3 (lr=2e-4)+layer4(lr=3e-4)+ fc(lr=3e-3) | 94.44 | 🏆 +15.44% |
 | Experiment 5 version 3 | + random Erasing augmentation + adding cosine annealing warmstart (replaced standard cosine annealing) | 95.14 | 🏆 +16.14% |
 
+
+### CutMix
+Combines two training images by replacing a random patch of one image with a patch from another. The labels are mixed proportionally to the patch area, helping improve robustness and generalization.
+
+### MixUp
+Generates new training samples by blending two images and their labels. This acts as a regularizer, reducing overfitting and encouraging smoother decision boundaries.
+
+### Random Erasing
+
+Random Erasing is a data augmentation technique that randomly masks a small region of an image during training. This encourages the model to rely on multiple visual features rather than specific image regions, improving robustness and reducing overfitting.
+
 ## Per-Class Classification Reports of Best candidates (Experiment 5 version 3 and version 3) and Baseline
 <table>
 <tr>
