@@ -22,13 +22,15 @@ The final model is capable of classifying images into the ten CIFAR-10 categorie
 ![Google Colab](https://img.shields.io/badge/Google_Colab-F9AB00?style=for-the-badge&logo=googlecolab&logoColor=white)
 ![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
 
-## Experiments Comparison 
-| Experiment | Modification | Val Acc (%) | Improvement |
-|------------|-------------|-------------|-------------|
-| Baseline | Pretrained Resnet18 + Unfreezing FC head and modified the head + Minimal training| 79| • Baseline |
-| Experiment 2 | + Unfreezing layer4+fc layers (learning rates= (1e-4,1e-3))| 87.96 | 🔺 +0.73% |
-| Experiment 3 | + Data Augmentation (RandomHorizontalFlip (p=0.5)+RandomRotation(degrees=15) + (learning rates= (1e-4,1e-3)) | 90.51 | 🔺 +1.86% |
-| Experiment 4 version 1 | + Cosine Annealing (learning rates= (1e-4,1e-3), layers=(fc,layer4)) | 91.64 | 🔺 +2.22% |
-| Experiment 4 | + MixUp | 92.11 | 🔺 +2.69% |
-| Experiment 5 | + CutMix | 92.84 | 🔺 +3.42% |
-| Final Model | Best Hyperparameters + Combined Techniques | 93.57 | 🏆 +4.15% |
+## validation Accuracy comparison across Experiments 
+| Experiment | Modification | Val Acc (%) | Improvement Over Baseline |
+|------------|-------------|-------------|---------------------------|
+| Baseline | Pretrained Resnet18 + Unfreezing FC head and modified the head + Minimal training | 79.00 | • Baseline |
+| Experiment 2 | + Unfreezing layer4+fc layers (learning rates= (1e-4,1e-3)) | 87.96 | 🔺 +8.96% |
+| Experiment 3 | + Data Augmentation (RandomHorizontalFlip (p=0.5)+RandomRotation(degrees=15) + (learning rates= (1e-4,1e-3)) | 90.51 | 🔺 +11.51% |
+| Experiment 4 version 1 | + Cosine Annealing (learning rates= (1e-4,1e-3), layers=(fc,layer4)) | 88.66 | 🔺 +9.66% |
+| Experiment 4 version 2 | + Cosine Anealing (higher learning rates (3e-4,3e-3),layers=(fc,layer4)) | 91.10 | 🔺 +12.10% |
+| Experiment 5 version 1 | + Cutmix/Mixup (learning rates (3e-4,3e-3),layers=(fc,layer4)) | 89.00 | 🔺 +10.00% |
+| Experiment 5 version 2 | + unfreezing layer3 (lr=2e-4)+layer4(lr=3e-4)+ fc(lr=3e-3) | 94.44 | 🏆 +15.44% |
+| Experiment 5 version 3 | + random Erasing augmentation + adding cosine annealing warmstart (replaced standard cosine annealing) | 95.14 | 🏆 +16.14% |
+
