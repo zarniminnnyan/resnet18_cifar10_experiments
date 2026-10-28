@@ -1,21 +1,21 @@
 ## Contents
 
 - [Project Overview](#project-overview)
-- [Key Takeaways](#key-takeaways)
 - [Built With](#built-with)
-- [Experiment Comparison](#experiment-comparison)
-- [Data Augmentation Techniques](#data-augmentation-techniques)
-- [Classification Reports](#per-class-classification-reports)
+- [Experiment Comparison](#validation-accuracy-comparison-across-experiments)
+- [Data Augmentation Techniques](#cutmix)
+- [Classification Reports](#per-class-classification-reports-of-best-candidates-experiment-5-v-2-and-v-3--and-baseline)
 - [Per-Class Accuracy Comparison](#per-class-accuracy-comparison)
 - [Confusion Matrix Comparison](#confusion-matrix-comparison)
-- [Model Calibration Evaluation](#model-calibration-evaluation)
-- [Model Selection Summary](#model-selection-summary)
-- [Quantization for Efficient CPU Inference](#quantization-for-efficient-cpu-inference)
-- [AOTInductor CPU Latency Comparison](#aotinductor-cpu-latency-comparison)
+- [Model Calibration](#model-calibration-evaluation)
+- [Temperature Scaling](#temperature-scaling)
+- [Calibration Comparison](#calibration-comparison-after-temperature-scaling)
+- [Model Selection](#model-selection-summary)
+- [Quantization](#quantization-of-best-candidate-experiment-5-version-30-for-efficient-cpu-inference-and-edge-devices)
+- [Model Profiles](#model-profiles-quantization-and-torchcompile)
+- [AOTInductor Benchmark](#aotinductor-cpu-latency-comparison)
 - [Summary](#summary)
-
-
-
+- [Quick Start](#quick-start)
 
 
 # Project Overview
