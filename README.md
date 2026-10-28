@@ -147,13 +147,16 @@ To make the model more suitable for deployment, two quantization techniques were
 
 **Static PTQ** converts a trained FP32 model to INT8 after training using calibration data. It is simpler and faster to apply because no retraining is required, but this convenience can come at the cost of a larger accuracy drop.
 
-## Model Profiles
+## Model Profiles after Quantization and Compilation
 
 | Model | Description | Test Acc (%) | Size (MB) | CPU Latency (ms) | Precision |
 |---------|---------|---------:|---------:|---------:|---------|
 | Baseline | Full-precision reference model | 🏆 94.31 | 44.80 | 19.94 | FP32 |
 | QAT | Quantization-Aware Training | 🥈 92.53 | 11.28 | 🏆 13.45 | INT8 |
 | Static PTQ | Post-Training Quantization | 🥉 91.80 | 11.28 | 13.81 | INT8 |
+
+### Compilation after pt2e Quantization is recommended in Pytorch Official Docs. Why?
+> Despite being 75% smaller, the quantized model was initially slower (~78 ms) than the FP32 model (19.94 ms) when executed without compilation. The overhead introduced by quantized operations outweighed the benefits of model compression. After compiling the model with **AOTInductor or JIT 'torch.compile()'**, graph-level optimizations and operator fusion reduced inference latency to 13.45 ms, making the quantized model both smaller and faster.
 
 ### Summary
 
@@ -162,5 +165,6 @@ To make the model more suitable for deployment, two quantization techniques were
 - **QAT** also achieved the fastest CPU inference time.
 - The **Baseline** model remained the most accurate, but required substantially more storage and had the highest latency.
 - Overall, **QAT provided the best balance between accuracy, model size, and inference speed for deployment.**
+
 
 
