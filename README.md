@@ -1,4 +1,4 @@
-#Project Overview
+# Project Overview
 
 This project explores whether a pretrained ResNet-18 model can be effectively adapted for the CIFAR-10 dataset while keeping its original architecture and pretrained ImageNet weights unchanged. Since CIFAR-10 images are only 32×32 pixels, they are first upscaled to 224×224 pixels to match the model's expected input size.
 
