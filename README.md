@@ -167,7 +167,7 @@ To make the model more suitable for deployment, two quantization techniques were
 | Static PTQ | Post-Training Quantization | 🥉 91.80 | 11.28 | 13.81 | INT8 |
 
 ### Compilation after pt2e Quantization is recommended in Pytorch Official Docs. Why?
-> Despite being 75% smaller, the quantized model was initially slower (~78 ms) than the FP32 model (19.94 ms) when executed without compilation. The overhead introduced by quantized operations outweighed the benefits of model compression. After compiling the model with **AOTInductor or JIT 'torch.compile()'**, graph-level optimizations and operator fusion reduced inference latency to 13.45 ms, making the quantized model both smaller and faster.
+> Despite being 75% smaller, the quantized model was initially slower (~56 ms) than the FP32 model (19.94 ms) when executed without compilation. The overhead introduced by quantized operations outweighed the benefits of model compression. After compiling the model with **AOTInductor or JIT 'torch.compile()'**, graph-level optimizations and operator fusion reduced inference latency to 13.45 ms, making the quantized model both smaller and faster.
 
 ### Summary
 
