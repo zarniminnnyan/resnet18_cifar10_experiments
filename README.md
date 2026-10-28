@@ -129,16 +129,16 @@ The final model's calibration performance was evaluated using **Expected Calibra
 - Exp 5 V3 achieved the lowest Log Loss (0.146) and NLL (0.146).
 - Exp 5 V3 also achieved the highest validation accuracy (95.14%).
 
-Overall, Exp 5 Version 3 was selected as the best model because it provided the highest classification accuracy while maintaining excellent calibration performance after temperature scaling.
+## Model Selection Summary
 
-## Best Model Summary
+| Model | Val Acc (%) | Test Acc (%) | ECE ↓ | Log Loss ↓ | NLL ↓ | Verdict |
+|---------|---------:|---------:|---------:|---------:|---------:|---------|
+| Baseline | 79.00 | 79.26 | 0.012 | 0.559 | 0.559 | Baseline |
+| Exp 5 V2 | 94.44 | 93.54 | 🏆 0.010 | 0.162 | 0.162 | Excellent calibration |
+| Exp 5 V3 | 🏆 95.14 | 🏆 94.31 | 0.012 | 🏆 0.146 | 🏆 0.146 | 🥇 Best Overall |
 
-| Criterion | Best Model |
-|------------|------------|
-| Highest Validation Accuracy | 🏆 Exp 5 V3 (95.14%) |
-| Lowest ECE | 🏆 Exp 5 V2 (0.010) |
-| Lowest Log Loss | 🏆 Exp 5 V3 (0.146) |
-| Lowest NLL | 🏆 Exp 5 V3 (0.146) |
-| Best Overall Trade-off | 🏆 Exp 5 V3 |
+Overall, Exp 5 Version 3 was selected as the best model because it provided the highest classification accuracy and also in test while maintaining excellent calibration performance after temperature scaling.
+
+
 
 
