@@ -35,23 +35,23 @@ The final model is capable of classifying images into the ten CIFAR-10 categorie
 | Experiment 5 version 3 | + random Erasing augmentation + adding cosine annealing warmstart (replaced standard cosine annealing) | 95.14 | 🏆 +16.14% |
 
 ## Per-Class Classification Reports
-
-## Per-Class Classification Reports
-
 <table>
 <tr>
 <td align="center">
 <b>Baseline</b><br>
-<img src="https://raw.githubusercontent.com/zarniminnnyan/resnet18_cifar10_experiments/main/gallaries/exp1_baseline_classification_report.png" width="300">
+<img src="https://raw.githubusercontent.com/zarniminnnyan/resnet18_cifar10_experiments/main/gallaries/exp1_baseline_classification_report.png" width="450">
 </td>
 
 <td align="center">
-<b>Experiment 5 V2</b><br>
-<img src="https://raw.githubusercontent.com/zarniminnnyan/resnet18_cifar10_experiments/main/gallaries/exp5_v2_classification_report.png" width="300">
+<b>Experiment 5 Version 2</b><br>
+<img src="https://raw.githubusercontent.com/zarniminnnyan/resnet18_cifar10_experiments/main/gallaries/exp5_v2_classification_report.png" width="450">
 </td>
+</tr>
 
-<td align="center">
-<bontent.com/zarniminnnyan/resnet18_cifar10_experiments/main/gallaries/exp5_v3_classification_report.png
+<tr>
+<td colspan="2" align="center">
+<b>Experiment 5 Version 3 (Final Model)</b><br>
+<img src="https://raw.githubusercontent.com/zarniminnnyan/resnet18_cifar10_experiments/main/gallaries/exp5_v3_classification_report.png" width="450">
 </td>
 </tr>
 </table>
