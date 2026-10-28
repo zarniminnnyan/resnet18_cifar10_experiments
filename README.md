@@ -36,21 +36,22 @@ The final model is capable of classifying images into the ten CIFAR-10 categorie
 
 ## Per-Class Classification Reports
 
+## Per-Class Classification Reports
+
 <table>
 <tr>
 <td align="center">
 <b>Baseline</b><br>
-<img src="https://raw.githubusercontent.com/zarniminnnyan/resnet18_cifar10_experiments/main/gallaries/exp1_baseline_classification_report.png" width="100%">
+<img src="https://raw.githubusercontent.com/zarniminnnyan/resnet18_cifar10_experiments/main/gallaries/exp1_baseline_classification_report.png" width="300">
 </td>
 
 <td align="center">
-<b>Experiment 5 Version 2</b><br>
-<img src="https://raw.githubusercontent.com/zarniminnnyan/resnet18_cifar10_experiments/main/gallaries/exp5_v2_classification_report.png" width="100%">
+<b>Experiment 5 V2</b><br>
+<img src="https://raw.githubusercontent.com/zarniminnnyan/resnet18_cifar10_experiments/main/gallaries/exp5_v2_classification_report.png" width="300">
 </td>
 
 <td align="center">
-<b>Experiment 5 Version 3</b><br>
-<img src="https://raw.githubusercontent.com/zarniminnnyan/resnet18_cifar10_experiments/main/gallaries/exp5_v3_classification_report.png" width="100%">
+<bontent.com/zarniminnnyan/resnet18_cifar10_experiments/main/gallaries/exp5_v3_classification_report.png
 </td>
 </tr>
 </table>
