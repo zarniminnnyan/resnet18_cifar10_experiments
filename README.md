@@ -158,19 +158,31 @@ To make the model more suitable for deployment, two quantization techniques were
 
 **Static PTQ** converts a trained FP32 model to INT8 after training using calibration data. It is simpler and faster to apply because no retraining is required, but this convenience can come at the cost of a larger accuracy drop.
 
-## Model Profiles after Quantization and Compilation
 
-| Model | Description | Test Acc (%) | Size (MB) | CPU Latency (ms) | Precision |
-|---------|---------|---------:|---------:|---------:|---------|
+
+## Model Profiles: Quantization and `torch.compile()`
+
+| **Model** | **Description** | **Test Acc (%)** | **Size (MB)** | **CPU Latency (ms)** | **Precision** |
+|---|---|---:|---:|---:|---|
 | Baseline | Full-precision reference model | 🏆 94.31 | 44.80 | 19.94 | FP32 |
 | QAT | Quantization-Aware Training | 🥈 92.53 | 11.28 | 🏆 13.45 | INT8 |
 | Static PTQ | Post-Training Quantization | 🥉 91.80 | 11.28 | 13.81 | INT8 |
 
 ### Why Compile After Quantization?
 
-Quantization reduced model size by approximately **75%**, but initially increased CPU latency to ~56 ms compared with 19.94 ms for the FP32 baseline. After applying **`torch.compile()`**, QAT latency dropped to **13.45 ms**.
+Quantization reduced model size by approximately **75%**, but initially increased CPU latency to ~56 ms compared with 19.94 ms for the FP32 baseline. After applying **`torch.compile()`**, QAT latency dropped to **13.45 ms**, demonstrating the potential benefits of compiler optimizations.
 
-With **AOTInductor**, measured CPU latency was 42.93 ms for the original FP32 model, 21.51 ms for Static PTQ, and 20.78 ms for QAT. QAT achieved the lowest latency among the three AOT-compiled models in this benchmark. Model artifact sizes were not reported by the current measurement function.
+### AOTInductor CPU Latency Comparison
+
+| **AOTInductor Model** | **CPU Latency (ms)** |
+|---|---:|
+| Original FP32 | 42.93 |
+| Static PTQ | 21.51 |
+| QAT | 20.78 |
+
+Among the three AOTInductor-compiled models, **QAT achieved the lowest CPU latency** in this benchmark. Model artifact sizes were not reported by the current measurement function.
+
+
 
 ### Summary
 
