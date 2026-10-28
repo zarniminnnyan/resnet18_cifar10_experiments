@@ -21,3 +21,14 @@ The final model is capable of classifying images into the ten CIFAR-10 categorie
 ![Kaggle](https://img.shields.io/badge/Kaggle-20BEFF?style=for-the-badge&logo=kaggle&logoColor=white)
 ![Google Colab](https://img.shields.io/badge/Google_Colab-F9AB00?style=for-the-badge&logo=googlecolab&logoColor=white)
 ![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
+
+## Experiments Comparison 
+| Experiment | Modification | Val Acc (%) | Improvement |
+|------------|-------------|-------------|-------------|
+| Baseline | Pretrained ResNet18 + Transfer Learning | 89.42 | • Baseline |
+| Experiment 1 | + Learning Rate Scheduler | 90.15 | 🔺 +0.73% |
+| Experiment 2 | + Data Augmentation | 91.28 | 🔺 +1.86% |
+| Experiment 3 | + Random Erasing | 91.64 | 🔺 +2.22% |
+| Experiment 4 | + MixUp | 92.11 | 🔺 +2.69% |
+| Experiment 5 | + CutMix | 92.84 | 🔺 +3.42% |
+| Final Model | Best Hyperparameters + Combined Techniques | 93.57 | 🏆 +4.15% |
