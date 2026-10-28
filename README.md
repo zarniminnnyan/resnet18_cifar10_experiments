@@ -25,10 +25,10 @@ The final model is capable of classifying images into the ten CIFAR-10 categorie
 ## Experiments Comparison 
 | Experiment | Modification | Val Acc (%) | Improvement |
 |------------|-------------|-------------|-------------|
-| Baseline | Pretrained ResNet18 + Transfer Learning | 89.42 | • Baseline |
-| Experiment 1 | + Learning Rate Scheduler | 90.15 | 🔺 +0.73% |
-| Experiment 2 | + Data Augmentation | 91.28 | 🔺 +1.86% |
-| Experiment 3 | + Random Erasing | 91.64 | 🔺 +2.22% |
+| Baseline | Pretrained Resnet18 + Unfreezing FC head and modified the head + Minimal training| 79| • Baseline |
+| Experiment 2 | + Unfreezing layer4+fc layers (learning rates= (1e-4,1e-3))| 87.96 | 🔺 +0.73% |
+| Experiment 3 | + Data Augmentation (RandomHorizontalFlip (p=0.5)+RandomRotation(degrees=15) + (learning rates= (1e-4,1e-3)) | 90.51 | 🔺 +1.86% |
+| Experiment 4 version 1 | + Cosine Annealing (learning rates= (1e-4,1e-3), layers=(fc,layer4)) | 91.64 | 🔺 +2.22% |
 | Experiment 4 | + MixUp | 92.11 | 🔺 +2.69% |
 | Experiment 5 | + CutMix | 92.84 | 🔺 +3.42% |
 | Final Model | Best Hyperparameters + Combined Techniques | 93.57 | 🏆 +4.15% |
