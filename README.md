@@ -96,3 +96,37 @@ The final model is capable of classifying images into the ten CIFAR-10 categorie
 </tr>
 </table>
 
+## Model Calibration Evaluation
+
+The final model's calibration performance was evaluated using **Expected Calibration Error (ECE)**, **Negative Log-Likelihood (NLL)**, and **Log Loss**. Lower values indicate better calibrated and more reliable confidence estimates.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/zarniminnnyan/resnet18_cifar10_experiments/main/gallaries/calibration.png" width="850"/>
+</p>
+## Calibration Comparison (After Temperature Scaling)
+
+| Model | Validation Accuracy (%) | ECE ↓ | Log Loss ↓ | NLL ↓ | Rank |
+|---------|---------:|---------:|---------:|---------:|---------|
+| Baseline | 79.00 | 0.012 | 0.559 | 0.559 | 🥉 |
+| Exp 5 V2 | 94.44 | 0.010 | 0.162 | 0.162 | 🥈 |
+| Exp 5 V3 | 95.14 | 0.012 | 0.146 | 0.146 | 🥇 Best Overall |
+
+- Lower ECE indicates better calibration.
+- Lower Log Loss and NLL indicate better confidence quality.
+- Exp 5 V2 achieved the lowest ECE (0.010).
+- Exp 5 V3 achieved the lowest Log Loss (0.146) and NLL (0.146).
+- Exp 5 V3 also achieved the highest validation accuracy (95.14%).
+
+Overall, Exp 5 Version 3 was selected as the best model because it provided the highest classification accuracy while maintaining excellent calibration performance after temperature scaling.
+
+## Best Model Summary
+
+| Criterion | Best Model |
+|------------|------------|
+| Highest Validation Accuracy | 🏆 Exp 5 V3 (95.14%) |
+| Lowest ECE | 🏆 Exp 5 V2 (0.010) |
+| Lowest Log Loss | 🏆 Exp 5 V3 (0.146) |
+| Lowest NLL | 🏆 Exp 5 V3 (0.146) |
+| Best Overall Trade-off | 🏆 Exp 5 V3 |
+
+
