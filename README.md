@@ -9,3 +9,7 @@ Beyond classification accuracy, the project also evaluates the model's confidenc
 For deployment, the project investigates multiple optimization strategies to improve CPU inference efficiency, including **Post-Training Quantization (PTQ), Quantization-Aware Training (QAT), `torch.compile()`, and the AOTInductor ahead-of-time compiler**. These techniques are compared to understand the trade-offs between model size, inference speed, and predictive performance.
 
 The final model is capable of classifying images into the ten CIFAR-10 categories: **airplane, automobile, bird, cat, deer, dog, frog, horse, ship, and truck.**
+
+
+# Tech Stack 
+python
