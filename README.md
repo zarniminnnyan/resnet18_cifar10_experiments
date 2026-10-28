@@ -34,3 +34,24 @@ The final model is capable of classifying images into the ten CIFAR-10 categorie
 | Experiment 5 version 2 | + unfreezing layer3 (lr=2e-4)+layer4(lr=3e-4)+ fc(lr=3e-3) | 94.44 | 🏆 +15.44% |
 | Experiment 5 version 3 | + random Erasing augmentation + adding cosine annealing warmstart (replaced standard cosine annealing) | 95.14 | 🏆 +16.14% |
 
+## Per-Class Classification Reports
+
+<table>
+<tr>
+<td align="center">
+<b>Baseline</b><br>
+<img src="https://raw.githubusercontent.com/zarniminnnyan/resnet18_cifar10_experiments/main/gallaries/exp1_baseline_classification_report.png" width="100%">
+</td>
+
+<td align="center">
+<b>Experiment 5 Version 2</b><br>
+<img src="https://raw.githubusercontent.com/zarniminnnyan/resnet18_cifar10_experiments/main/gallaries/exp5_v2_classification_report.png" width="100%">
+</td>
+
+<td align="center">
+<b>Experiment 5 Version 3</b><br>
+<img src="https://raw.githubusercontent.com/zarniminnnyan/resnet18_cifar10_experiments/main/gallaries/exp5_v3_classification_report.png" width="100%">
+</td>
+</tr>
+</table>
+
