@@ -12,4 +12,8 @@ The final model is capable of classifying images into the ten CIFAR-10 categorie
 
 
 # Tech Stack 
-python
+## Built With
+
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white)
+![Gradio](https://img.shields.io/badge/Gradio-FF9A00?style=flat-square&logo=gradio&logoColor=white)
