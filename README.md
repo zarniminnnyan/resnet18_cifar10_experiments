@@ -71,3 +71,28 @@ The final model is capable of classifying images into the ten CIFAR-10 categorie
 | Ship | 84.3 | 95.7 | 96.6 |
 | Truck | 86.7 | 95.7 | 96.3 |
 
+## Confusion Matrix Comparison
+
+<table>
+<tr>
+<td align="center">
+<b>Baseline</b><br>
+<img src="https://raw.githubusercontent.com/zarniminnnyan/resnet18_cifar10_experiments/main/gallaries/baseline_confusion_matrix.png" width="450">
+</td>
+
+<td align="center">
+<b>Experiment 5 Version 2</b><br>
+<img src="https://raw.githubusercontent.com/zarniminnnyan/resnet18_cifar10_experiments/main/gallaries/exp5_v2_confusion_matrix.png" width="450">
+</td>
+</tr>
+
+<tr>
+<td align="left">
+<b>Experiment 5 Version 3 (Final Model)</b><br>
+<img src="https://raw.githubusercontent.com/zarniminnnyan/resnet18_cifar10_experiments/main/gallaries/exp5_v3_confusion_matrix.png" width="450">
+</td>
+
+<td></td>
+</tr>
+</table>
+
