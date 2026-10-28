@@ -103,6 +103,7 @@ The final model's calibration performance was evaluated using **Expected Calibra
 <p align="center">
   <img src="https://raw.githubusercontent.com/zarniminnnyan/resnet18_cifar10_experiments/main/gallaries/calibration.png" width="850"/>
 </p>
+
 ## Calibration Comparison (After Temperature Scaling)
 
 | Model | Validation Accuracy (%) | ECE ↓ | Log Loss ↓ | NLL ↓ | Rank |
