@@ -204,13 +204,13 @@ This model serves as the reference baseline for all quantization and compiler ex
 
 Quantization reduced model size by approximately **75%**, but initially increased CPU latency to ~56 ms compared with 19.94 ms for the FP32 baseline. After applying **`torch.compile()`**, QAT latency dropped to **13.45 ms**, demonstrating the potential benefits of compiler optimizations.
 
-### AOTInductor CPU Latency Comparison
+### AOTInductor Model Comparison
 
-| **AOTInductor Model** | **CPU Latency (ms)** |
-|---|---:|
-| Original FP32 | 42.93 |
-| Static PTQ | 21.51 |
-| QAT | 20.78 |
+| Model | Test Acc (%) | Precision | Average CPU Latency (ms) |
+|---------|---------:|---------|---------:|
+| Original FP32 | 🏆 94.31 | FP32 | 24.80 |
+| Static PTQ | 91.84 | INT8 | 🏆 14.71 |
+| QAT | 🥈 92.52 | INT8 | 15.01 |
 
 Among the three AOTInductor-compiled models, **QAT achieved the lowest CPU latency** in this benchmark. Model artifact sizes were not reported by the current measurement function.
 
