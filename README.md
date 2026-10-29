@@ -2,6 +2,7 @@
 
 - [Project Overview](#project-overview)
 - [Built With](#built-with)
+ - [Quick Start](#quick-start)
 - [Experiment Comparison](#validation-accuracy-comparison-across-experiments)
 - [Data Augmentation Techniques](#cutmix)
 - [Classification Reports](#per-class-classification-reports-of-best-candidates-experiment-5-v-2-and-v-3--and-baseline)
@@ -15,7 +16,6 @@
 - [Model Profiles](#model-profiles-quantization-and-torchcompile)
 - [AOTInductor Benchmark](#aotinductor-cpu-latency-comparison)
 - [Summary](#summary)
-- [Quick Start](#quick-start)
 
 
 # Project Overview
@@ -178,9 +178,21 @@ To make the model more suitable for deployment, two quantization techniques were
 
 **Static PTQ** converts a trained FP32 model to INT8 after training using calibration data. It is simpler and faster to apply because no retraining is required, but this convenience can come at the cost of a larger accuracy drop.
 
+## FP32 Baseline Performance
+
+Before applying quantization or compiler optimizations, the final FP32 model (Experiment 5 Version 3) achieved the following performance on CPU:
+
+| Metric | Value |
+|----------|----------:|
+| Test Accuracy | 🏆 94.31% |
+| Average Latency | 33.82 ms |
+| Model Size | 44.80 MB |
+| Precision | FP32 |
+
+This model serves as the reference baseline for all quantization and compiler experiments.
 
 
-## Model Profiles: Quantization and `torch.compile()`
+## Model Profiles after Quantization and `torch.compile()`
 
 | **Model** | **Description** | **Test Acc (%)** | **Size (MB)** | **CPU Latency (ms)** | **Precision** |
 |---|---|---:|---:|---:|---|
