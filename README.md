@@ -4,7 +4,7 @@
 - [Built With](#built-with)
  - [Quick Start](#quick-start)
 - [Experiment Comparison](#validation-accuracy-comparison-across-experiments)
-- [Data Augmentation Techniques](#cutmix)
+- [Cutmix/Mixup/Random Erasing](#cutmix)
 - [Classification Reports](#per-class-classification-reports-of-best-candidates-experiment-5-v-2-and-v-3--and-baseline)
 - [Per-Class Accuracy Comparison](#per-class-accuracy-comparison)
 - [Confusion Matrix Comparison](#confusion-matrix-comparison)
