@@ -42,6 +42,17 @@ The final model classifies images into the ten CIFAR-10 categories: **airplane, 
 ![Google Colab](https://img.shields.io/badge/Google_Colab-F9AB00?style=for-the-badge&logo=googlecolab&logoColor=white)
 ![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
 
+## Quick start 
+## Quick Start
+
+1. Clone the repository:
+
+```bash
+git clone <repository_url>
+cd <repository_name>
+2. Create virtual environment
+
+
 ## validation Accuracy comparison across Experiments 
 | Experiment | Modification | Val Acc (%) | Improvement Over Baseline |
 |------------|-------------|-------------|---------------------------|
