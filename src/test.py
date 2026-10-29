@@ -19,30 +19,25 @@ def get_parameters_for_lightning_model_inference(
 ):
     """
     Extracts training configurations and reconstructs parameters from a legacy checkpoint.
-
     NOTE: This manual extraction function is explicitly required for previously trained 
     legacy models because the original `__init__` constructor used `ignore=['model']` 
     and added the change_to_warmstart_scheduler argument after training from exp1 to exp5,
     this breaks lighning's original 
     model loading style
-
     RECOMMENDATION FOR FUTURE TRAINING RUNS:
-
     To bypass this extraction function entirely in future experiments, avoid passing raw 
     `nn.Module` objects or live parameter groups into `__init__`. Instead, pass primitive 
     datatypes (e.g., `learning_rates: list`) and build the model architecture inside
     the LightningModule constructor. Doing so will enable simple, one-line loading 
     via `Resnet18Lightning.load_from_checkpoint("path.ckpt")`.
-
     Args:
         model_dir (str): Root directory where experiments are stored.
         experiment_name (str): Specific experiment folder and weight name prefix.
         device (torch.device): Compute device target (CPU or GPU).
-
     Returns:
         tuple: (base_model,change_to_warmstart_scheduler)
     """
-    ckpt_path = os.path.join(f"{model_dir}/{experiment_name}", f"{experiment_name}_weight.ckpt")
+    ckpt_path = os.path.join(f"{model_dir}", f"{experiment_name}_weight.ckpt")
     
     # Load raw checkpoint safely to device memory
     checkpoint = torch.load(ckpt_path, map_location=device)
@@ -73,7 +68,6 @@ def get_parameters_for_lightning_model_inference(
 
     return base_model,change_to_warmstart_scheduler,layers
 
-
 def load_model_for_test(
     is_baseline:bool,
     model_dir:str,
@@ -84,14 +78,12 @@ def load_model_for_test(
     
     """
     Load a ResNet18 model for testing.
-
     Args:
         is_baseline (bool): If True, load baseline weights (.pth).
                             If False, load Lightning checkpoint (.ckpt).
         model_dir (str): Directory containing model weights.
         experiment_name (str): Experiment name used for checkpoint file.
         num_classes (int): Number of output classes for classification.
-
     Returns:
         nn.Module: ResNet18 model with loaded weights.
     """
@@ -105,7 +97,7 @@ def load_model_for_test(
     #load the existed model weights
     if is_baseline:
       #weight dir
-      baseline_weight_directory=os.path.join(f"{model_dir}/baseline","best_baseline_eval_model.pth")
+      baseline_weight_directory=os.path.join(f"{model_dir}","best_baseline_eval_model.pth")
       #load model
       state_dict=torch.load(baseline_weight_directory,map_location=device)
       model.load_state_dict(state_dict)
@@ -118,7 +110,7 @@ def load_model_for_test(
              )     
         
         model=Resnet18Lightning.load_from_checkpoint(
-            checkpoint_path=os.path.join(f"{model_dir}/{experiment_name}",f"{experiment_name}_weight.ckpt"),
+            checkpoint_path=os.path.join(f"{model_dir}",f"{experiment_name}_weight.ckpt"),
             model=base_model,
             change_to_warmstart_scheduler=change_to_warmstart_scheduler,
             layers=layers

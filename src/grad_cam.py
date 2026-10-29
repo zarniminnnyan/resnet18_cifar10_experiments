@@ -91,9 +91,9 @@ def process_input_image(
     gradcam: Any,
     model: Any,
     classes: List[str],
-    experiment_name: str,
     device: torch.device,
-    temperature_path:Optional[str]=None
+    experiment_name:Optional[str]=None, #These two arguments are for temperature scaling 
+    temperature_path:Optional[str]=None # e.g temperature_path/temperature_{experiment_name}.pth
 ):
     """
     Process input image, apply temperature scaling, calculate top-5 predictions,
@@ -139,9 +139,9 @@ def process_input_image(
                 memory_format=torch.channels_last )
             )
             
-            T = load_calibrated_temperature_helper()
-
             if add_temperature:
+                
+                T = load_calibrated_temperature_helper()
                 probs = torch.softmax(outputs / T, dim=1)
             else:
                 probs = torch.softmax(outputs, dim=1)

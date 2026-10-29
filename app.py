@@ -30,7 +30,6 @@ TEMPERATURE_EXPERIMENT_NAMES = {
 
 _baseline_model = None
 _gradcam = None
-_compiled_models = {}
 
 def _get_gradcam():
     global _baseline_model, _gradcam
@@ -728,7 +727,9 @@ with gr.Blocks(
                     ["./images/ship.png"],
                     ["./images/automobile.png"],
                     ["./images/deer.png"],
-                    ["./images/bird.png"]
+                    ["./images/bird.png"],
+                    ["./images/truck.png"]
+
                 ],
                 inputs=input_image,
                 label="Choose a sample image",
