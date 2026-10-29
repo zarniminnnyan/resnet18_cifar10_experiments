@@ -13,8 +13,8 @@
 - [Calibration Comparison](#calibration-comparison-after-temperature-scaling)
 - [Model Selection](#model-selection-summary)
 - [Quantization](#quantization-of-best-candidate-experiment-5-version-30-for-efficient-cpu-inference-and-edge-devices)
-- [Model Profiles](#model-profiles-quantization-and-torchcompile)
-- [AOTInductor Benchmark](#aotinductor-cpu-latency-comparison)
+- [Model Profiles](#model-profiles-after-quantization-and-torchcompile)
+- [AOTInductor Benchmark](#aotinductor-model-comparison)
 - [Summary](#summary)
 
 
