@@ -42,17 +42,46 @@ The final model classifies images into the ten CIFAR-10 categories: **airplane, 
 ![Google Colab](https://img.shields.io/badge/Google_Colab-F9AB00?style=for-the-badge&logo=googlecolab&logoColor=white)
 ![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
 
-## Quick start 
+
 ## Quick Start
 
-1. Clone the repository:
-
 ```bash
+# Clone the repository
 git clone <repository_url>
 cd <repository_name>
-'''
-2. Create virtual environment
 
+# Create and activate a virtual environment
+python -m venv venv
+
+# Windows
+venv\Scripts\activate
+
+# Linux/macOS
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### Run the Gradio App
+
+```bash
+python -m app
+```
+
+### Run Image Prediction
+
+Download the FP32 model from Hugging Face and place it in the same directory as `app.py`.
+
+```bash
+python -m predict --image_path <path_to_image>
+```
+
+Example:
+
+```bash
+python -m predict --image_path ./images/sample.png
+```
 
 ## validation Accuracy comparison across Experiments 
 | Experiment | Modification | Val Acc (%) | Improvement Over Baseline |
