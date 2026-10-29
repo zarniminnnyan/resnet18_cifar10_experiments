@@ -50,6 +50,7 @@ The final model classifies images into the ten CIFAR-10 categories: **airplane, 
 ```bash
 git clone <repository_url>
 cd <repository_name>
+'''
 2. Create virtual environment
 
 
