@@ -74,7 +74,7 @@ python -m app
 Download the FP32 model from Hugging Face and place it in the same directory as `app.py`.
 
 ```bash
-python -m predict --image_path <path_to_image>
+python -m predict --image_path <path_to_image> --image_name <image_name>
 ```
 
 Example:
