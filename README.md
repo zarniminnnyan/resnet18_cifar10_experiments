@@ -80,7 +80,7 @@ python -m predict --image_path <path_to_image> --image_name <image_name>
 Example:
 
 ```bash
-python -m predict --image_path ./images/sample.png
+python -m predict --image_path ./images/ --image_name cat.png
 ```
 
 ## validation Accuracy comparison across Experiments 
