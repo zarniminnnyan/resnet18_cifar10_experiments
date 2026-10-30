@@ -1,3 +1,16 @@
+---
+title: Cifar10 Classifier
+emoji: 🐨
+colorFrom: gray
+colorTo: green
+sdk: gradio
+sdk_version: 6.31.0
+python_version: '3.12'
+app_file: app.py
+pinned: false
+license: mit
+---
+
 ## Contents
 
 - [Project Overview](#project-overview)
