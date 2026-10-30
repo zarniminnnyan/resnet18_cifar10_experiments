@@ -1,41 +1,42 @@
-from src.grad_cam import process_input_image
-from app import _get_gradcam
+from pprint import pprint
 import argparse
 import torch
 
-cifar10_classes = [
-    "airplane", "automobile", "bird", "cat", "deer",
-    "dog", "frog", "horse", "ship", "truck"
-]
+from src.grad_cam import process_input_image
+from config.exp_config import cifar10_class_names
+from app import _get_gradcam
 
+
+
+# Use GPU if available, otherwise fall back to CPU
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 
-def configurable_arguments():
-    """Configure options for prediction test"""
+def configure_arguments():
+    """Configure command-line options for prediction."""
 
     parser = argparse.ArgumentParser(
-        description="Prediction test configurable options"
+        description="Prediction test configuration"
     )
 
     parser.add_argument(
         "--image_path",
         type=str,
         default="./",
-        help="Images directory"
+        help="Directory containing the input image"
     )
 
     parser.add_argument(
         "--image_name",
         type=str,
         required=True,
-        help="Image name to predict"
+        help="Image file name to predict"
     )
 
     parser.add_argument(
         "--add_temperature",
         action="store_true",
-        help="Apply temperature scaling"
+        help="Apply temperature scaling during inference"
     )
 
     parser.add_argument(
@@ -48,28 +49,35 @@ def configurable_arguments():
     parser.add_argument(
         "--temperature_path",
         type=str,
-        default=None,
-        help="Path to saved temperature value"
+        default="./temperature",
+        help="Directory containing saved temperature values"
     )
 
     return parser.parse_args()
 
 
 if __name__ == "__main__":
-    args = configurable_arguments()
 
-    _model, _gradcam = _get_gradcam()
+    print("=== Running Prediction ===\n")
 
-_, _, top5,_, _=process_input_image(
+    # Read user configuration from CLI
+    args = configure_arguments()
+
+    # Load model and Grad-CAM
+    model, gradcam = _get_gradcam()
+
+    # Process image and generate prediction
+    _, _, top5, _, _ = process_input_image(
         image_path=args.image_path,
         image_name=args.image_name,
         add_temperature=args.add_temperature,
-        gradcam=_gradcam,
-        model=_model, #Note: model file name should be same as mine since it's hardcoded as {experiment_name}_weight.ckpt
-        classes=cifar10_classes,
-        experiment_name=args.experiment_name, # e.g temperature_{experiment_name}.pth
+        gradcam=gradcam,
+        model=model,
+        classes=cifar10_class_names,
+        experiment_name=args.experiment_name,
         temperature_path=args.temperature_path,
         device=device,
     )
 
-print(f"Top-5 scores for model prediction. Highest score is the predicted class: {top5}")
+    print("\n----- Top-5 Predictions (Highest score is the predicted class) --------")
+    pprint(top5)

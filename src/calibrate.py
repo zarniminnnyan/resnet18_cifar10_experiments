@@ -15,7 +15,16 @@ import os
 
 
 @torch.no_grad()
-def calibrate_eval_model(models:dict, val_dataset, batch_size:int, device:torch.device, split_size:int, bins_size:int,initial_T:int):
+def calibrate_eval_model(
+    models:dict, 
+    val_dataset, 
+    batch_size:int, 
+    device:torch.device, 
+    split_size:int,
+     bins_size:int,
+     initial_T:float,
+     temperature_path:str="./temperature"
+     ):
     """
     Do Model Calibration with ECE, Log Loss to know the behavior of the actual accuracy and model's general accuracy 
     Args:
@@ -25,7 +34,8 @@ def calibrate_eval_model(models:dict, val_dataset, batch_size:int, device:torch.
          device (cpu or gpu): Device name for operation 
          split_size (int): Split size for Calibration dataset 
          bins_size (int): bins size for ECE measurement
-         initial_T (int): initial T for temperature scaling (T>1 if model calibration is over confidence, T<1 for underconfidence, T=1 (original))
+         temperature_path: Temperature path for optimized temperature value
+         initial_T (float): initial T for temperature scaling (T>1 if model calibration is over confidence, T<1 for underconfidence, T=1 (original))
 
     Returns: 
         results (list of dicts): calibration metrics before and after temperature scaling
@@ -115,13 +125,13 @@ def calibrate_eval_model(models:dict, val_dataset, batch_size:int, device:torch.
         ece_after, bin_conf_after, bin_acc_after = calculate_ece(y_true, y_probs_after)
         logloss_after = log_loss(y_true, y_probs_after)
         # make directory if no exists
-        os.makedirs("./temperature",exist_ok=True)
+        os.makedirs(f"{temperature_path}",exist_ok=True)
 
         #save the optimized temperature 
         torch.save({
             "optimized_temperature":temperature.item()
         },
-        os.path.join("./temperature",f"temperature_{model_name}.pth")
+        os.path.join(f"{temperature_path}",f"temperature_{model_name}.pth")
         )
 
         results.append({

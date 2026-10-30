@@ -37,27 +37,30 @@ def get_parameters_for_lightning_model_inference(
     Returns:
         tuple: (base_model,change_to_warmstart_scheduler)
     """
-    ckpt_path = os.path.join(f"{model_dir}", f"{experiment_name}_weight.ckpt")
-    
+    ckpt_path = os.path.join(f"{model_dir}", f"{experiment_name}_weight.ckpt")    
     # Load raw checkpoint safely to device memory
-    checkpoint = torch.load(ckpt_path, map_location=device)
+    try:
+       checkpoint = torch.load(ckpt_path, map_location=device)
+
+    except FileNotFoundError:
+       
+       raise FileNotFoundError(
+          f"Checkpoint not found: {ckpt_path}"
+          )
     
     # Extract successfully logged primitive configurations
     saved_hparams = checkpoint.get("hyper_parameters", {})
-    print("--- Extracting Configurations ---")
+    print("Loading Model Configuration ...... \n\n")
     
     try:
         layers = saved_hparams.get("layers",["layer4","fc"])
        
         change_to_warmstart_scheduler = saved_hparams.get("change_to_warmstart_scheduler", False)
-        
-        optimizer_states = checkpoint.get("optimizer_states", [])
-        if optimizer_states:
-            learning_rates = [group["lr"] for group in optimizer_states[0]["param_groups"]]
-        else:
-            raise KeyError("optimizer_states empty or missing in the checkpoint file.")
 
-        print(f"Extracted learning rates from training: {learning_rates}")
+        try:
+            checkpoint.get("optimizer_states", [])
+        except (ValueError,KeyError):
+           raise KeyError("optimizer_states empty or missing in the checkpoint file.")
         
     except (KeyError, IndexError, TypeError) as e:
         print(f"Extraction failed: Critical training parameters are missing from this checkpoint.")

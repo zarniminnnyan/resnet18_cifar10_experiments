@@ -42,7 +42,6 @@ The final model classifies images into the ten CIFAR-10 categories: **airplane, 
 ![Google Colab](https://img.shields.io/badge/Google_Colab-F9AB00?style=for-the-badge&logo=googlecolab&logoColor=white)
 ![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
 
-
 ## Quick Start
 
 ```bash
@@ -69,19 +68,83 @@ pip install -r requirements.txt
 python -m app
 ```
 
-### Run Image Prediction
+### Temperature Calibration (Optional)
 
-Download the FP32 model from Hugging Face and place it in the same directory as `app.py`.
+Temperature scaling can be applied to improve confidence calibration before running inference. The optimized temperature is computed using the validation set and saved for future predictions.
 
 ```bash
-python -m predict --image_path <path_to_image> --image_name <image_name>
+python -m temperature
+```
+
+Custom configuration:
+
+```bash
+python -m temperature \
+    --experiment_name exp5_v3 \
+    --temperature_path ./temperature
+```
+
+### Run Image Prediction
+
+Download the trained FP32 model and place it in the project root directory.
+
+#### Standard Inference
+
+```bash
+python -m predict \
+    --image_path <image_directory> \
+    --image_name <image_name>
 ```
 
 Example:
 
 ```bash
-python -m predict --image_path ./images/ --image_name cat.png
+python -m predict \
+    --image_path ./images \
+    --image_name cat.png
 ```
+
+#### Inference with Temperature Scaling
+
+After generating the temperature value using `temperature.py`, enable calibrated inference with:
+
+```bash
+python -m predict \
+    --image_path ./images \
+    --image_name cat.png \
+    --add_temperature
+```
+
+Custom configuration:
+
+```bash
+python -m predict \
+    --image_path ./images \
+    --image_name cat.png \
+    --add_temperature \
+    --experiment_name exp5_v3 \
+    --temperature_path ./temperature
+```
+
+### Command-Line Arguments
+
+#### predict.py
+
+| Argument | Description |
+|----------|-------------|
+| `--image_path` | Directory containing the input image |
+| `--image_name` | Image filename to predict |
+| `--add_temperature` | Apply temperature scaling during inference |
+| `--experiment_name` | Model experiment name |
+| `--temperature_path` | Directory containing saved temperature values |
+
+#### temperature.py
+
+| Argument | Description |
+|----------|-------------|
+| `--experiment_name` | Model experiment name to calibrate |
+| `--temperature_path` | Directory where optimized temperature values are saved |
+
 
 ## validation Accuracy comparison across Experiments 
 | Experiment | Modification | Val Acc (%) | Improvement Over Baseline |

@@ -104,6 +104,8 @@ def process_input_image(
     """
     
     def load_calibrated_temperature_helper():
+        
+        os.makedirs(temperature_path,exist_ok=True)
         temp_file = os.path.join(temperature_path, f"temperature_{experiment_name}.pth")
         if not os.path.exists(temp_file):
             raise FileNotFoundError(f"Temperature file not found: {temp_file}")

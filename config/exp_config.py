@@ -1,6 +1,6 @@
 
 #define the dataset directory
-dataset_dir="/kaggle/input/datasets/zarniminnnyan/my-data/data"
+dataset_dir="./dataset"
 
 #metrics_logs_dir 
 logs_dir="./main_model_logs/logs"
@@ -28,18 +28,36 @@ cutmix_mixup_probability=0.5 #every 50% chance, add cutmix/mixup augmentation
 #resume directory for resuming baseline training
 resume_dir="./checkpoints/baseline_resume_checkpoints"
 #evaluated baseline weight directory 
-baseline_model_dir="/teamspace/studios/this_studio/resnet18_cifar10_classifier/results/baseline"
+baseline_model_dir="./baseline_model"
 
 #main model directory 
 main_model_dir="./checkpoints/main_model_eval_weight"
 
-#compiled model directory 
-compiled_directory="./compiled models"
-temperature_path="./temperature"
-#Saved original model directory 
-original_model_path="./original model"
-#csv file path- (( Note: if you have trained main model and saved the csv metrics in 'main_model_dir' via pytorch lightning ModelCheckpoints,
-# you will need to download each manually and then add them in the 'csv file path' because when you resume training 
-# over and over, the metrics file is not stacked in one file. it is seperated file by file))
+#CONFIGURATION FOR GRADIO APP ONLY
 
-csv_file_path="/teamspace/studios/this_studio/resnet18_cifar10_classifier/results"
+# Default experiment used throughout the project
+EXPERIMENT_NAME = "exp5_v3"
+
+# Directory containing saved temperature values
+TEMPERATURE_PATH = "./temperature"
+ADD_TEMPERATURE=False
+
+
+# CSV file paths
+# Note: When training is resumed multiple times with PyTorch Lightning ModelCheckpoint,
+# metrics are saved as separate CSV files. Download and add each CSV file path manually.
+csv_file_path="/models/results"
+
+# CIFAR-10 class labels
+cifar10_class_names = [
+    "airplane",
+    "automobile",
+    "bird",
+    "cat",
+    "deer",
+    "dog",
+    "frog",
+    "horse",
+    "ship",
+    "truck",
+]

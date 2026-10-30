@@ -13,3 +13,4 @@ seaborn==0.13.2
 pytorch_lightning 
 lightning 
 huggingface_hub
+scikit-learn

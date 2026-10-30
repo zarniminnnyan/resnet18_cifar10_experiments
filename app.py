@@ -7,9 +7,10 @@ import matplotlib.pyplot as plt
 from html import escape
 
 from config.exp_config import (
-    temperature_path, 
-    original_model_path,
-    compiled_directory
+    TEMPERATURE_PATH,
+    EXPERIMENT_NAME,
+    ADD_TEMPERATURE,
+    cifar10_class_names
     )
 from src.grad_cam import process_input_image, GradCAM
 from src.test import load_model_for_test
@@ -17,16 +18,7 @@ from src.test import load_model_for_test
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-cifar10_classes = [
-    "airplane", "automobile", "bird", "cat", "deer",
-    "dog", "frog", "horse", "ship", "truck"
-]
 
-
-
-TEMPERATURE_EXPERIMENT_NAMES = {
-    "Baseline": "Original",
-}
 
 _baseline_model = None
 _gradcam = None
@@ -38,7 +30,7 @@ def _get_gradcam():
         loaded = load_model_for_test(
             is_baseline=False,
             model_dir="./",
-            experiment_name="exp5_v3",
+            experiment_name=EXPERIMENT_NAME,
             num_classes=10,
             device=device,
         )
@@ -104,14 +96,14 @@ def generate_original_gradcam(input_image):
 
         pred_idx, pred_conf, top5, fig, input_tensor = process_input_image(
             image_path=os.path.dirname(tmp_path),
-            temperature_path=temperature_path,
+            temperature_path=TEMPERATURE_PATH,
             image_name=os.path.basename(tmp_path),
             gradcam=gradcam,
             model=baseline_model,
-            classes=cifar10_classes,
-            experiment_name="Original",
+            classes=cifar10_class_names,
+            experiment_name=EXPERIMENT_NAME, # for temperature , e.g temperature_{temperature_name}.pth
             device=device,
-            add_temperature=True,
+            add_temperature=ADD_TEMPERATURE,
         )
 
         # Measure model-only inference using the tensor returned by preprocessing.
@@ -155,7 +147,7 @@ def generate_original_gradcam(input_image):
             else pred_conf
         )
 
-        pred_class = cifar10_classes[pred_idx]
+        pred_class = cifar10_class_names[pred_idx]
         
         result_text = f"""
         <div class="prediction-summary">
@@ -684,21 +676,30 @@ with gr.Blocks(
     )
 
     gr.Markdown(
-        
-"This project adapts a pretrained ResNet18 model for CIFAR-10 by upscaling 224 * 224 without changing the pretrained model for image size 32 * 32 by using **transfer learning, learning rate scheduler, "
-"data augmentation, CutMix, MixUp, and hyperparameter tuning**. "
-"It evaluates model reliability using **Expected Calibration Error (ECE), "
-"Negative Log-Likelihood (NLL), Log Loss, and temperature scaling**. "
-"It also explores deployment optimizations for efficient CPU inference, including "
-"**Quantization-Aware Training (QAT), Post-Training Quantization (PTQ), "
-"the AOTInductor ahead-of-time compiler, and torch.compile() for just-in-time compilation**. "
-"The model classifies images into 10 CIFAR-10 classes: **airplane, automobile, bird, "
-"cat, deer, dog, frog, horse, ship, and truck**.\n\n"
-"**Note:** This model was trained exclusively on these 10 classes. If you upload "
-"an image that does not belong to any of them, the model may incorrectly assign it "
-"to one of the known classes and return confidence scores for its predictions. "
-"These scores do not indicate that the image actually belongs to the predicted class. "
-"The model is not designed to detect or reject images from unknown classes."
+                """
+This project adapts an ImageNet-pretrained ResNet18 for CIFAR-10
+classification. The original 32 × 32 images are resized to 224 × 224
+to match the input dimensions expected by the pretrained model.
+
+The training workflow explores **transfer learning, learning-rate
+scheduling, data augmentation, CutMix, MixUp, and hyperparameter tuning**.
+
+Model reliability is evaluated using **Expected Calibration Error (ECE),
+Negative Log-Likelihood (NLL), Log Loss, and temperature scaling**.
+
+Deployment experiments compare FP32 inference with INT8 quantization
+using **Quantization-Aware Training (QAT), Static Post-Training
+Quantization (PTQ), AOTInductor, and torch.compile()**.
+
+The classifier supports ten CIFAR-10 classes: **airplane, automobile,
+bird, cat, deer, dog, frog, horse, ship, and truck**.
+
+**Limitation:** The model is designed for CIFAR-10. Predictions on
+out-of-distribution images may be unreliable.
+
+**Ongoing experiment:** Investigating out-of-distribution detection
+and energy-based scoring methods.
+        """
 
     )
 
@@ -795,7 +796,7 @@ Use the baseline FP32 weights below as a starting point for local inference or f
 
     # Serve the user's actual FP32 checkpoint from the current working directory.
     # This intentionally uses the exact path requested, not original_model_path.
-    baseline_weights_path = os.path.abspath("./exp5_v3_weight.ckpt")
+    baseline_weights_path = os.path.abspath(f"./{EXPERIMENT_NAME}_weight.ckpt")
     if os.path.isfile(baseline_weights_path):
         gr.DownloadButton(
             label="Download F32 Model Weights (.ckpt)",
