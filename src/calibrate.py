@@ -165,9 +165,17 @@ def visualize_reliability_diagram(calibrated_result:List[Dict],model_names:List,
     cols=math.ceil(math.sqrt(len(model_names)))
     rows=math.ceil(len(model_names)/cols)
    
-    fig,axes=plt.subplots(rows,cols,figsize=(rows*row_expand,cols*col_expand))
-    
-    for idx,ax in enumerate(axes.flatten()[:len(calibrated_result)]):
+    fig,axes=plt.subplots(
+        rows,cols,
+        figsize=(rows*row_expand,cols*col_expand)
+        )
+    if len(calibrated_result) == 1:
+        axes_iter = [axes]
+    else:
+        axes_iter = axes.flatten()
+        
+    for idx, ax in enumerate(axes_iter[:len(calibrated_result)]):
+
         ax.plot([0, 1], [0, 1], 'k--', label='Perfectly calibrated')
         ax.plot(calibrated_result[idx]["before_temperature_bin_conf"],calibrated_result[idx]["before_temperature_bin_acc"], color='orange', marker='o', 
         label=f'Before T: Calibration curve of {calibrated_result[idx]["model_name"]}', linewidth=2, markersize=8
